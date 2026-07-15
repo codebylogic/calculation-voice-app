@@ -488,7 +488,9 @@
             { id: "percentage", name: "Percentage", desc: "Percent value calculations (e.g., 20% of 150)", defaultCount: 0 },
             { id: "tables", name: "Tables (11-30)", desc: "Multiplications of factors from 11 to 30", defaultCount: 0 },
             { id: "decimal", name: "Decimal Arithmetic", desc: "Addition / subtraction with decimals", defaultCount: 0 },
-            { id: "bodmas", name: "BODMAS Rules", desc: "Evaluate basic parenthetical equations", defaultCount: 0 }
+            { id: "bodmas", name: "BODMAS Rules", desc: "Evaluate basic parenthetical equations", defaultCount: 0 },
+            { id: "square_root", name: "Square Root (21-100)", desc: "Find the square root of perfect squares between 21 to 100", defaultCount: 0 }
+            
         ];
 
         let appSettings = {
@@ -818,6 +820,20 @@
                     correctAnswer = a * a;
                     break;
                 }
+                case "Square Root (21-100)": {
+    // 21 से 100 के बीच एक रैंडम नंबर चुनें
+    const base = Math.floor(Math.random() * (100 - 21 + 1)) + 21;
+    // उसका परफेक्ट स्क्वायर निकालें (जैसे 25 का 625)
+    const perfectSquare = base * base;
+    
+    // सवाल में परफेक्ट स्क्वायर दिखाएंगे (जैसे: √625)
+    questionText = `√${perfectSquare}`;
+    // सही जवाब वह बेस नंबर होगा (जैसे: 25)
+    correctAnswer = base;
+    break;
+}
+
+                    
                 case "LCM": {
                     const a = Math.floor(Math.random() * 16) + 4; 
                     const b = Math.floor(Math.random() * 16) + 4; 
@@ -1126,7 +1142,13 @@
                 .replace(/\bfor\b/g, 'four')
                 .replace(/\bpoint\b/g, '.')
                 .replace(/\bदशमलव\b/g, '.')
-                .replace(/\band\b/g, ''); 
+                .replace(/\band\b/g, '')
+                // इस लाइन को ढूँढें:
+
+// और इसके ठीक नीचे यह लाइन जोड़ दें:
+.replace(/\broot\b/g, '')
+.replace(/\bरूट\b/g, '')
+                ; 
 
             const words = clean.split(/\s+/);
             

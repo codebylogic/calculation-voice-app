@@ -1283,31 +1283,44 @@
                 document.getElementById('mic-status-label').className = "text-xs font-bold text-emerald-400";
             };
 
-            rec.onresult = function(event) {
+                        rec.onresult = function(event) {
                 let finalTranscript = '';
+                let interimTranscript = '';
+
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
                     }
                 }
 
-                if (finalTranscript !== '') {
-                    document.getElementById('test-spoken-transcript').innerText = `"${finalTranscript.trim()}"`;
+                // जो भी शब्द वॉयस इंजन को तुरंत सुनाई दे रहा है (चाहे फाइनल हो या अंतरिम)
+                let currentSpeech = finalTranscript || interimTranscript;
+
+                if (currentSpeech !== '') {
+                    document.getElementById('test-spoken-transcript').innerText = `"${currentSpeech.trim()}"`;
                     document.getElementById('test-spoken-transcript').className = "text-indigo-400 font-bold";
 
                     const curQ = activeTestState.questions[activeTestState.currentIndex];
-                    const matched = verifyVerbalResponse(finalTranscript, curQ.correctAnswer);
+                    
+                    // 🔽 यहाँ यह तुरंत चेक करेगा, बिना इस बात का इंतज़ार किए कि आप आगे कुछ और बोलेंगे 🔽
+                    const matched = verifyVerbalResponse(currentSpeech, curQ.correctAnswer);
 
                     if (matched) {
-                        handleAnswerValidation(true, `Verified speech match: "${finalTranscript.trim()}"`);
+                        handleAnswerValidation(true, `Verified speech match: "${currentSpeech.trim()}"`);
                     } else {
-                        const parsedValue = reconstructSpokenNumber(finalTranscript);
-                        if (parsedValue !== null) {
-                            handleAnswerValidation(false);
+                        // अगर फाइनल रिजल्ट आ चुका है और वो गलत है, तभी गलत मानेगा
+                        if (finalTranscript !== '') {
+                            const parsedValue = reconstructSpokenNumber(finalTranscript);
+                            if (parsedValue !== null) {
+                                handleAnswerValidation(false);
+                            }
                         }
                     }
                 }
             };
+
 
             rec.onerror = function(event) {
                 console.log("Speech Engine Error:", event.error);

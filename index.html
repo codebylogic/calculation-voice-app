@@ -1150,7 +1150,7 @@
             return null;
         }
 
-        function reconstructSpokenNumber(text) {
+                function reconstructSpokenNumber(text) {
             let clean = text.toLowerCase().trim()
                 .replace(/[^a-zA-Z0-9\s.\u0900-\u097F]/g, '') // Allow Hindi unicode characters
                 .replace(/\bto\b/g, 'two')
@@ -1163,11 +1163,24 @@
                 .replace(/\bcube\b/g, '')
                 .replace(/\bक्यूब\b/g, '')
                 .replace(/\band\b/g, ''); 
-            
-                ; 
+
+            // 🔽 0 से 9 के लिए स्पेशल डायरेक्ट मैच डिक्शनरी 🔽
+            const singleDigitMap = {
+                'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9,
+                'शून्य': 0, 'एक': 1, 'दो': 2, 'तीन': 3, 'चार': 4, 'पांच': 5, 'छह': 6, 'सात': 7, 'आठ': 8, 'नौ': 9, 'दस': 10
+            };
+
+            if (singleDigitMap[clean] !== undefined) {
+                return singleDigitMap[clean];
+            }
 
             const words = clean.split(/\s+/);
             
+            // अगर केवल एक ही शब्द बोला गया है और वो डिक्शनरी में है
+            if (words.length === 1 && singleDigitMap[words[0]] !== undefined) {
+                return singleDigitMap[words[0]];
+            }
+
             const directMatch = clean.match(/[\d.]+/);
             if (directMatch) {
                 const val = parseFloat(directMatch[0]);
@@ -1219,8 +1232,8 @@
             }
 
             return null;
-        }
-
+                }
+                
         function verifyVerbalResponse(transcript, actualAns) {
             const parsedObj = reconstructSpokenNumber(transcript);
             if (parsedObj === null) return false;

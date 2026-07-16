@@ -1150,7 +1150,8 @@
             return null;
         }
 
-                function reconstructSpokenNumber(text) {
+                        function reconstructSpokenNumber(text) {
+            // इनपुट को पूरी तरह साफ करना और फालतू स्पेस हटाना
             let clean = text.toLowerCase().trim()
                 .replace(/[^a-zA-Z0-9\s.\u0900-\u097F]/g, '') // Allow Hindi unicode characters
                 .replace(/\bto\b/g, 'two')
@@ -1164,29 +1165,35 @@
                 .replace(/\bक्यूब\b/g, '')
                 .replace(/\band\b/g, ''); 
 
-            // 🔽 0 से 9 के लिए स्पेशल डायरेक्ट मैच डिक्शनरी 🔽
+            // 0 से 9 के लिए हर संभव टेक्स्ट इनपुट की मैपिंग (English, Hindi, and variations)
             const singleDigitMap = {
                 'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9,
-                'शून्य': 0, 'एक': 1, 'दो': 2, 'तीन': 3, 'चार': 4, 'पांच': 5, 'छह': 6, 'सात': 7, 'आठ': 8, 'नौ': 9, 'दस': 10
+                '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
+                'शून्य': 0, 'एक': 1, 'दो': 2, 'तीन': 3, 'चार': 4, 'पांच': 5, 'पाँच': 5, 'छह': 6, 'छः': 6, 'सात': 7, 'आठ': 8, 'नौ': 9, 'दस': 10
             };
 
+            // चेक 1: अगर साफ किए गए टेक्स्ट में सीधे कोई डिजिट मैच मिल जाए (जैसे "5" या " 5 ")
+            const directMatch = clean.match(/[\d.]+/);
+            if (directMatch) {
+                const val = parseFloat(directMatch[0]);
+                if (!isNaN(val) && val >= 0 && val <= 9) return val;
+            }
+
+            // चेक 2: पूरे वाक्य को चेक करना कि क्या उसमें कहीं भी कोई सिंगल डिजिट शब्द छिपा है
+            const words = clean.split(/\s+/);
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i].trim();
+                if (singleDigitMap[word] !== undefined) {
+                    return singleDigitMap[word];
+                }
+            }
+
+            // चेक 3: अगर पूरा साफ़ किया हुआ टेक्स्ट सीधे मैप हो जाए
             if (singleDigitMap[clean] !== undefined) {
                 return singleDigitMap[clean];
             }
 
-            const words = clean.split(/\s+/);
-            
-            // अगर केवल एक ही शब्द बोला गया है और वो डिक्शनरी में है
-            if (words.length === 1 && singleDigitMap[words[0]] !== undefined) {
-                return singleDigitMap[words[0]];
-            }
-
-            const directMatch = clean.match(/[\d.]+/);
-            if (directMatch) {
-                const val = parseFloat(directMatch[0]);
-                if (!isNaN(val)) return val;
-            }
-
+            // पुराने बड़े नंबर्स का लॉजिक (जैसा था वैसा ही)
             let isConsecutiveSequence = true;
             let digitSequenceStr = "";
             for (let i = 0; i < words.length; i++) {
@@ -1233,6 +1240,7 @@
 
             return null;
                 }
+        
                 
         function verifyVerbalResponse(transcript, actualAns) {
             const parsedObj = reconstructSpokenNumber(transcript);

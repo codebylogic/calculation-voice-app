@@ -116,7 +116,7 @@
             <!-- Features Cards Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 <div class="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl space-y-3">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-lg font-bold">15</div>
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-lg font-bold">16</div>
                     <h3 class="text-md font-bold text-slate-100">Customizable Formats</h3>
                     <p class="text-xs text-slate-400">Choose from basic Double Addition, Squares, Decimal Arithmetic, to BODMAS structures.</p>
                 </div>
@@ -484,6 +484,8 @@
             { id: "ts_mult", name: "T × S", desc: "Triple digit × Single digit multiplication", defaultCount: 0 },
             { id: "square", name: "Square", desc: "Find square of numbers between 11 to 99", defaultCount: 0 },
             { id: "square_root", name: "Square Root (21-100)", desc: "Find the square root of perfect squares between 21 to 100", defaultCount: 0 },
+            { id: "cube_root", name: "Cube Root (11-50)", desc: "Find the cube root of perfect cubes between 11 to 50", defaultCount: 0 },
+            
             { id: "lcm", name: "LCM", desc: "Least Common Multiple of two integers", defaultCount: 0 },
             { id: "hcf", name: "HCF", desc: "Highest Common Factor of two integers", defaultCount: 0 },
             { id: "percentage", name: "Percentage", desc: "Percent value calculations (e.g., 20% of 150)", defaultCount: 0 },
@@ -833,6 +835,19 @@
     correctAnswer = base;
     break;
 }
+                    case "Cube Root (11-50)": {
+    // 11 से 50 के बीच एक रैंडम नंबर चुनें
+    const base = Math.floor(Math.random() * (50 - 11 + 1)) + 11;
+    // उसका परफेक्ट क्यूब निकालें (जैसे 12 का 1728)
+    const perfectCube = base * base * base;
+    
+    // सवाल में परफेक्ट क्यूब दिखाएंगे (∛ सिंबल के साथ)
+    questionText = `∛${perfectCube}`;
+    // सही जवाब वह बेस नंबर होगा (जैसे: 12)
+    correctAnswer = base;
+    break;
+                    }
+                    
 
                     
                 case "LCM": {
@@ -1143,12 +1158,12 @@
                 .replace(/\bfor\b/g, 'four')
                 .replace(/\bpoint\b/g, '.')
                 .replace(/\bदशमलव\b/g, '.')
-                .replace(/\band\b/g, '')
-                // इस लाइन को ढूँढें:
-
-// और इसके ठीक नीचे यह लाइन जोड़ दें:
-.replace(/\broot\b/g, '')
-.replace(/\bरूट\b/g, '')
+                .replace(/\broot\b/g, '')
+                .replace(/\bरूट\b/g, '')
+                .replace(/\bcube\b/g, '')
+                .replace(/\bक्यूब\b/g, '')
+                .replace(/\band\b/g, ''); 
+            
                 ; 
 
             const words = clean.split(/\s+/);

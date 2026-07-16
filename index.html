@@ -1283,7 +1283,7 @@
                 document.getElementById('mic-status-label').className = "text-xs font-bold text-emerald-400";
             };
 
-                        rec.onresult = function(event) {
+            rec.onresult = function(event) {
                 let finalTranscript = '';
                 let interimTranscript = '';
 
@@ -1295,7 +1295,6 @@
                     }
                 }
 
-                // जो भी शब्द वॉयस इंजन को तुरंत सुनाई दे रहा है (चाहे फाइनल हो या अंतरिम)
                 let currentSpeech = finalTranscript || interimTranscript;
 
                 if (currentSpeech !== '') {
@@ -1303,15 +1302,23 @@
                     document.getElementById('test-spoken-transcript').className = "text-indigo-400 font-bold";
 
                     const curQ = activeTestState.questions[activeTestState.currentIndex];
-                    
-                    // 🔽 यहाँ यह तुरंत चेक करेगा, बिना इस बात का इंतज़ार किए कि आप आगे कुछ और बोलेंगे 🔽
-                    const matched = verifyVerbalResponse(currentSpeech, curQ.correctAnswer);
+                    const expectedAns = String(curQ.correctAnswer).trim();
 
-                    if (matched) {
-                        handleAnswerValidation(true, `Verified speech match: "${currentSpeech.trim()}"`);
-                    } else {
-                        // अगर फाइनल रिजल्ट आ चुका है और वो गलत है, तभी गलत मानेगा
-                        if (finalTranscript !== '') {
+                    // 1. सिंगल डिजिट (0-9) के लिए: अंतरिम (interim) रिस्पांस में भी तुरंत मैच कर लो
+                    if (expectedAns.length === 1) {
+                        const matched = verifyVerbalResponse(currentSpeech, curQ.correctAnswer);
+                        if (matched) {
+                            handleAnswerValidation(true, `Verified speech match: "${currentSpeech.trim()}"`);
+                            return; // यहीं से बाहर निकल जाएं
+                        }
+                    }
+
+                    // 2. बड़े नंबर्स (जैसे 132, 2916) के लिए: वॉयस इंजन के फाइनल रिजल्ट का इंतज़ार करो
+                    if (finalTranscript !== '') {
+                        const matched = verifyVerbalResponse(finalTranscript, curQ.correctAnswer);
+                        if (matched) {
+                            handleAnswerValidation(true, `Verified speech match: "${finalTranscript.trim()}"`);
+                        } else {
                             const parsedValue = reconstructSpokenNumber(finalTranscript);
                             if (parsedValue !== null) {
                                 handleAnswerValidation(false);
@@ -1320,6 +1327,7 @@
                     }
                 }
             };
+                        
 
 
             rec.onerror = function(event) {

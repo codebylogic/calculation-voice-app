@@ -1285,44 +1285,25 @@
 
             rec.onresult = function(event) {
                 let finalTranscript = '';
-                let interimTranscript = '';
-
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         finalTranscript += event.results[i][0].transcript;
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
                     }
                 }
 
-                let currentSpeech = finalTranscript || interimTranscript;
-
-                if (currentSpeech !== '') {
-                    document.getElementById('test-spoken-transcript').innerText = `"${currentSpeech.trim()}"`;
+                if (finalTranscript !== '') {
+                    document.getElementById('test-spoken-transcript').innerText = `"${finalTranscript.trim()}"`;
                     document.getElementById('test-spoken-transcript').className = "text-indigo-400 font-bold";
 
                     const curQ = activeTestState.questions[activeTestState.currentIndex];
-                    const expectedAns = String(curQ.correctAnswer).trim();
+                    const matched = verifyVerbalResponse(finalTranscript, curQ.correctAnswer);
 
-                    // 1. सिंगल डिजिट (0-9) के लिए: अंतरिम (interim) रिस्पांस में भी तुरंत मैच कर लो
-                    if (expectedAns.length === 1) {
-                        const matched = verifyVerbalResponse(currentSpeech, curQ.correctAnswer);
-                        if (matched) {
-                            handleAnswerValidation(true, `Verified speech match: "${currentSpeech.trim()}"`);
-                            return; // यहीं से बाहर निकल जाएं
-                        }
-                    }
-
-                    // 2. बड़े नंबर्स (जैसे 132, 2916) के लिए: वॉयस इंजन के फाइनल रिजल्ट का इंतज़ार करो
-                    if (finalTranscript !== '') {
-                        const matched = verifyVerbalResponse(finalTranscript, curQ.correctAnswer);
-                        if (matched) {
-                            handleAnswerValidation(true, `Verified speech match: "${finalTranscript.trim()}"`);
-                        } else {
-                            const parsedValue = reconstructSpokenNumber(finalTranscript);
-                            if (parsedValue !== null) {
-                                handleAnswerValidation(false);
-                            }
+                    if (matched) {
+                        handleAnswerValidation(true, `Verified speech match: "${finalTranscript.trim()}"`);
+                    } else {
+                        const parsedValue = reconstructSpokenNumber(finalTranscript);
+                        if (parsedValue !== null) {
+                            handleAnswerValidation(false);
                         }
                     }
                 }

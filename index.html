@@ -473,6 +473,19 @@
 
     <!-- Active State Logic Implementation Code -->
     <script>
+        // सभी 16 कैटेगरीज़ का करंट डिफिकल्टी लेवल (1: आसान, 2: मीडियम, 3: कठिन)
+let categoryDifficulty = JSON.parse(localStorage.getItem('categoryDifficulty')) || {
+    // जोड़, घटाव, गुणा, भाग
+    "Addition": 2, "Subtraction": 2, "Multiplication": 2, "Division": 2,
+    "Addition (1 Digit)": 2, "Subtraction (1 Digit)": 2,
+    "Addition (3 Digit)": 2, "Subtraction (3 Digit)": 2,
+    // रूट्स
+    "Square Root (21-100)": 2, "Cube Root (11-50)": 2,
+    "Square Root (1-20)": 2, "Cube Root (1-10)": 2,
+    // अन्य कैटेगोरीज (BODMAS, Fractions आदि जो भी आपके ऐप में हैं, उनके नाम यहाँ लिख लें)
+    "BODMAS Rules": 2, "Fractions": 2, "Percentage": 2, "Decimals": 2
+};
+        
         // --- DATA SETUP ---
         const categories = [
             { id: "dd_add", name: "D + D", desc: "Double digit + double digit addition", defaultCount: 5 },
@@ -872,56 +885,215 @@
                     correctAnswer = (p * base) / 100;
                     break;
                 }
-                case "Tables (11-30)": {
-                    const a = Math.floor(Math.random() * 20) + 11; 
-                    const b = Math.floor(Math.random() * 9) + 2;  
-                    questionText = `${a} × ${b}`;
-                    correctAnswer = a * b;
-                    break;
-                }
-                case "Decimal Arithmetic": {
-                    const isAdd = Math.random() > 0.5;
-                    const a = parseFloat((Math.random() * 15 + 2).toFixed(1));
-                    const b = parseFloat((Math.random() * 15 + 2).toFixed(1));
-                    if (isAdd) {
-                        questionText = `${a} + ${b}`;
-                        correctAnswer = parseFloat((a + b).toFixed(1));
-                    } else {
-                        const big = Math.max(a, b);
-                        const small = Math.min(a, b);
-                        questionText = `${big} - ${small}`;
-                        correctAnswer = parseFloat((big - small).toFixed(1));
-                    }
-                    break;
-                }
-                case "BODMAS Rules": {
-                    const ops = ['+', '-', '*'];
-                    const opSelected = ops[Math.floor(Math.random() * ops.length)];
-                    if (opSelected === '+') {
-                        const a = Math.floor(Math.random() * 10) + 2;
-                        const b = Math.floor(Math.random() * 10) + 2;
-                        const c = Math.floor(Math.random() * 8) + 2;
-                        questionText = `(${a} + ${b}) × ${c}`;
-                        correctAnswer = (a + b) * c;
-                    } else if (opSelected === '-') {
-                        const a = Math.floor(Math.random() * 20) + 10;
-                        const b = Math.floor(Math.random() * 8) + 2;
-                        const c = Math.floor(Math.random() * 4) + 1;
-                        questionText = `${a} - (${b} × ${c})`;
-                        correctAnswer = a - (b * c);
-                    } else {
-                        const a = Math.floor(Math.random() * 6) + 1; 
-                        const b = Math.floor(Math.random() * 6) + 1; 
-                        const c = Math.floor(Math.random() * 10) + 5;
-                        questionText = `(${a} × ${b}) + ${c}`;
-                        correctAnswer = (a * b) + c;
-                    }
-                    break;
-                }
-            }
+function generateArithmeticExpression(categoryName) {
+    let questionText = '';
+    let correctAnswer = 0;
+    
+    // वर्तमान डिफिकल्टी लेवल (1, 2 या 3)
+    const level = categoryDifficulty[categoryName] || 2;
 
-            return { questionText, correctAnswer };
+    switch(categoryName) {
+        // ================= 1. ADDITION MODES =================
+        case "Addition (1 Digit)": {
+            let max = (level === 1) ? 4 : (level === 2) ? 7 : 9;
+            const num1 = Math.floor(Math.random() * max) + 1;
+            const num2 = Math.floor(Math.random() * max) + 1;
+            questionText = `${num1} + ${num2}`;
+            correctAnswer = num1 + num2;
+            break;
         }
+        case "Addition":
+        case "Addition (2 Digit)": {
+            let min1 = 10, max1 = 99, min2 = 10, max2 = 99;
+            if (level === 1) { max1 = 40; max2 = 40; } 
+            else if (level === 3) { min1 = 60; min2 = 60; } 
+            
+            const num1 = Math.floor(Math.random() * (max1 - min1 + 1)) + min1;
+            const num2 = Math.floor(Math.random() * (max2 - min2 + 1)) + min2;
+            questionText = `${num1} + ${num2}`;
+            correctAnswer = num1 + num2;
+            break;
+        }
+        case "Addition (3 Digit)": {
+            let min = 100, max = 999;
+            if (level === 1) max = 400;
+            else if (level === 3) min = 600;
+            const num1 = Math.floor(Math.random() * (max - min + 1)) + min;
+            const num2 = Math.floor(Math.random() * (max - min + 1)) + min;
+            questionText = `${num1} + ${num2}`;
+            correctAnswer = num1 + num2;
+            break;
+        }
+
+        // ================= 2. SUBTRACTION MODES =================
+        case "Subtraction (1 Digit)": {
+            const num1 = (level === 1) ? Math.floor(Math.random() * 5) + 5 : Math.floor(Math.random() * 6) + 4;
+            const num2 = Math.floor(Math.random() * num1) + 1;
+            questionText = `${num1} - ${num2}`;
+            correctAnswer = num1 - num2;
+            break;
+        }
+        case "Subtraction":
+        case "Subtraction (2 Digit)": {
+            let min = 10, max = 99;
+            if (level === 1) { max = 50; } 
+            else if (level === 3) { min = 50; }
+            let num1 = Math.floor(Math.random() * (max - min + 1)) + min;
+            let num2 = Math.floor(Math.random() * (num1 - min + 1)) + min;
+            
+            if (level === 1 && (num1 % 10) < (num2 % 10)) {
+                let temp = num1; num1 = num2; num2 = temp; 
+            }
+            const maxNum = Math.max(num1, num2);
+            const minNum = Math.min(num1, num2);
+            questionText = `${maxNum} - ${minNum}`;
+            correctAnswer = maxNum - minNum;
+            break;
+        }
+        case "Subtraction (3 Digit)": {
+            let min = 100, max = 999;
+            if (level === 1) max = 500;
+            else if (level === 3) min = 500;
+            const num1 = Math.floor(Math.random() * (max - min + 1)) + min;
+            const num2 = Math.floor(Math.random() * (num1 - min + 1)) + min;
+            const maxNum = Math.max(num1, num2);
+            const minNum = Math.min(num1, num2);
+            questionText = `${maxNum} - ${minNum}`;
+            correctAnswer = maxNum - minNum;
+            break;
+        }
+
+        // ================= 3. MULTIPLICATION MODES =================
+        case "Multiplication (1 Digit)": {
+            let max = (level === 1) ? 5 : 9;
+            const num1 = Math.floor(Math.random() * max) + 1;
+            const num2 = Math.floor(Math.random() * max) + 1;
+            questionText = `${num1} × ${num2}`;
+            correctAnswer = num1 * num2;
+            break;
+        }
+        case "Multiplication":
+        case "Multiplication (2 Digit)": {
+            let n1_min = 11, n1_max = 19, n2_min = 2, n2_max = 9; 
+            if (level === 1) { n1_max = 12; n2_max = 5; } 
+            else if (level === 3) { n1_min = 12; n1_max = 50; n2_min = 11; n2_max = 19; } 
+            
+            const num1 = Math.floor(Math.random() * (n1_max - n1_min + 1)) + n1_min;
+            const num2 = Math.floor(Math.random() * (n2_max - n2_min + 1)) + n2_min;
+            questionText = `${num1} × ${num2}`;
+            correctAnswer = num1 * num2;
+            break;
+        }
+
+        // ================= 4. DIVISION MODES =================
+        case "Division":
+        case "Division (Perfect)": {
+            let base_min = 2, base_max = 10, mult_min = 2, mult_max = 10;
+            if (level === 1) { base_max = 5; mult_max = 5; }
+            else if (level === 3) { base_min = 11; base_max = 20; mult_min = 5; mult_max = 12; }
+            
+            const divisor = Math.floor(Math.random() * (base_max - base_min + 1)) + base_min;
+            const quotient = Math.floor(Math.random() * (mult_max - mult_min + 1)) + mult_min;
+            const dividend = divisor * quotient;
+            
+            questionText = `${dividend} ÷ ${divisor}`;
+            correctAnswer = quotient;
+            break;
+        }
+
+        // ================= 5. ROOT MODES =================
+        case "Square Root (1-20)": {
+            let min = 1, max = 20;
+            if (level === 1) max = 10;
+            else if (level === 3) min = 11;
+            const base = Math.floor(Math.random() * (max - min + 1)) + min;
+            questionText = `√${base * base}`;
+            correctAnswer = base;
+            break;
+        }
+        case "Square Root (21-100)": {
+            let min = 21, max = 100;
+            if (level === 1) max = 50; 
+            else if (level === 3) min = 70; 
+            const base = Math.floor(Math.random() * (max - min + 1)) + min;
+            questionText = `√${base * base}`;
+            correctAnswer = base;
+            break;
+        }
+        case "Cube Root (1-10)": {
+            let min = 1, max = 10;
+            if (level === 1) max = 5;
+            else if (level === 3) min = 6;
+            const base = Math.floor(Math.random() * (max - min + 1)) + min;
+            questionText = `∛${base * base * base}`;
+            correctAnswer = base;
+            break;
+        }
+        case "Cube Root (11-50)": {
+            let min = 11, max = 50;
+            if (level === 1) max = 25; 
+            else if (level === 3) min = 35; 
+            const base = Math.floor(Math.random() * (max - min + 1)) + min;
+            questionText = `∛${base * base * base}`;
+            correctAnswer = base;
+            break;
+        }
+
+        // ================= 6. ADVANCED MATH MODES =================
+        case "Fractions": {
+            // आसान लेवल में समान हर (Same Denominator), कठिन में अलग हर
+            if (level === 1) {
+                const den = Math.floor(Math.random() * 4) + 2; 
+                const num1 = Math.floor(Math.random() * 3) + 1;
+                const num2 = Math.floor(Math.random() * 3) + 1;
+                questionText = `${num1}/${den} + ${num2}/${den}`;
+                correctAnswer = parseFloat(((num1 + num2) / den).toFixed(2));
+            } else {
+                const den1 = Math.floor(Math.random() * 4) + 2;
+                const den2 = Math.floor(Math.random() * 4) + 2;
+                const num1 = Math.floor(Math.random() * 3) + 1;
+                const num2 = Math.floor(Math.random() * 3) + 1;
+                questionText = `${num1}/${den1} + ${num2}/${den2}`;
+                correctAnswer = parseFloat(((num1 / den1) + (num2 / den2)).toFixed(2));
+            }
+            break;
+        }
+        case "Percentage": {
+            let base = (level === 1) ? 100 : (level === 2) ? 50 : 25;
+            let pct = (level === 1) ? 10 : (level === 2) ? 20 : 15;
+            let num = Math.floor(Math.random() * 5) + 1;
+            let finalNum = base * num; 
+            questionText = `${pct}% of ${finalNum}`;
+            correctAnswer = parseFloat(((pct / 100) * finalNum).toFixed(2));
+            break;
+        }
+        case "Decimals": {
+            let factor = (level === 1) ? 10 : 100;
+            let num1 = parseFloat((Math.random() * 9 + 1).toFixed(level === 1 ? 1 : 2));
+            let num2 = parseFloat((Math.random() * 9 + 1).toFixed(level === 1 ? 1 : 2));
+            questionText = `${num1} + ${num2}`;
+            correctAnswer = parseFloat((num1 + num2).toFixed(2));
+            break;
+        }
+        case "BODMAS Rules": 
+        default: {
+            if (level === 1) {
+                questionText = "2 × 3 + 4";
+                correctAnswer = 10;
+            } else if (level === 2) {
+                questionText = "12 ÷ 3 + 5 × 2";
+                correctAnswer = 14;
+            } else {
+                questionText = "(15 + 5) ÷ 4 × 9";
+                correctAnswer = 45;
+            }
+            break;
+        }
+    }
+    
+    return { questionText, correctAnswer };
+}
+
 
         function startTestProcess() {
             activeTestState.questions = [];
@@ -1023,19 +1195,30 @@
             }
         }
 
-        function handleAnswerValidation(isCorrect, textOverride = "") {
-            stopSpeechRecognition();
-            clearInterval(activeTestState.currentQuestionTimer);
+        function handleAnswerValidation(isCorrect, debugMsg) {
+    // ... आपका स्कोर बढ़ाने और बाकी का पुराना कोड यहाँ रहेगा ...
 
-            const curQ = activeTestState.questions[activeTestState.currentIndex];
+    // 🔽 यहाँ उस चालू कैटेगरी का नाम निकालें (जो भी आपके कोड में वेरिएबल का नाम हो, जैसे currentCategory)
+    const currentCategory = activeTestState.currentCategoryName || activeTestState.category; 
 
-            if (isCorrect) {
-                activeTestState.correctCount++;
-                activeTestState.scoresBreakdown[curQ.category].correct++;
-                playFeedbackBeep(true);
-            } else {
-                playFeedbackBeep(false);
-            }
+    if (isCorrect) {
+
+        if (categoryDifficulty[currentCategory] < 3) {
+            categoryDifficulty[currentCategory] += 1;
+        }
+    } else {
+
+        if (categoryDifficulty[currentCategory] > 1) {
+            categoryDifficulty[currentCategory] -= 1;
+        }
+    }
+
+
+    localStorage.setItem('categoryDifficulty', JSON.stringify(categoryDifficulty));
+
+
+
+
 
             const overlay = document.getElementById('validation-overlay');
             const titleEl = document.getElementById('validation-title');

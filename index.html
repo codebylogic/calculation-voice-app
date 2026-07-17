@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-Powered Calculation Trainer (Hindi/Hinglish Support)</title>
+    
+    <!-- PWA Meta Tags and Manifest Link -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="apple-touch-icon" href="./icon.png">
+
+    <script>
+        if ('service-worker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('Service Worker Registered Successfully!'))
+                    .catch(err => console.log('Service Worker Registration Failed', err));
+            });
+        }
+    </script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            950: '#090d16',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Fonts and Custom Smooth Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-between overflow-x-hidden antialiased">
+
+    <!-- Top Navigation Bar (Always Visible) -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('home')">
+                <div class="bg-gradient-to-tr from-brand-500 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-400 bg-clip-text text-transparent">CALCU-VOICE</h1>
+                    <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Interactive Speech Math</p>
+                </div>
+            </div>
+            
+            <nav class="flex space-x-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800/80">
+                <button onclick="navigateTo('home')" id="nav-home" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 text-brand-500 bg-indigo-500/10">
+                    Home
+                </button>
+                <button onclick="navigateTo('settings')" id="nav-settings" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 text-slate-400 hover:text-white">
+                    Settings
+                </button>
+                <button onclick="navigateTo('scores')" id="nav-scores" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 text-slate-400 hover:text-white">
+                    Scores
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8 flex flex-col justify-start">
+
+        <!-- HOME PAGE -->
+        <section id="view-home" class="space-y-12 animate-fade-in">
+            <div class="text-center max-w-3xl mx-auto space-y-6 pt-6">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-400 border border-brand-500/20">
+                    🎙️ Voice-Activated Verbal Calculation Trainer (Hindi/Hinglish Support)
+                </span>
+                <h2 class="text-4xl md:text-5xl font-black tracking-tight leading-tight text-white">
+                    Sharpen Your Mind Using <span class="bg-gradient-to-r from-brand-400 to-indigo-500 bg-clip-text text-transparent">Verbal Power</span>
+                </h2>
+                <p class="text-slate-400 text-base md:text-lg leading-relaxed">
+                    Improve your mental arithmetic dynamically. Simply listen to or view the math challenge, speak the answer aloud in English, Hindi, or Hinglish, and our smart engine verifies it instantly in real-time.
+                </p>
+            </div>
+
+            <!-- Features Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-lg font-bold">16</div>
+                    <h3 class="text-md font-bold text-slate-100">Customizable Formats</h3>
+                    <p class="text-xs text-slate-400">Choose from basic Double Addition, Squares, Decimal Arithmetic, to BODMAS structures.</p>
+                </div>
+                <div class="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-400 text-lg">🎙️</div>
+                    <h3 class="text-md font-bold text-slate-100">Hindi/Hinglish Engine</h3>
+                    <p class="text-xs text-slate-400">Speak naturally! Supports parsing of numbers spoken in English, Hindi, or pure numerical digits.</p>
+                </div>
+                <div class="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400 text-lg">📈</div>
+                    <h3 class="text-md font-bold text-slate-100">Simulated MD Logger</h3>
+                    <p class="text-xs text-slate-400">Saves reports directly into a virtual Markdown scoreboard file to track and parse performance trends.</p>
+                </div>
+            </div>
+
+            <!-- Play Trigger Section -->
+            <div class="flex flex-col items-center justify-center pt-8 border-t border-slate-900">
+                <div class="text-center mb-6">
+                    <p class="text-sm text-slate-500">Ready to put your computational speed to the test?</p>
+                </div>
+                <button onclick="navigateTo('customize')" class="group relative px-8 py-4 bg-gradient-to-r from-brand-600 to-indigo-600 text-white font-extrabold text-lg rounded-2xl shadow-xl shadow-indigo-600/20 hover:shadow-indigo-600/40 transform transition-all hover:-translate-y-1 active:translate-y-0 flex items-center space-x-3">
+                    <span>Let's Play Trainer</span>
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- PLAY: CUSTOMIZE SCREEN -->
+        <section id="view-customize" class="hidden space-y-8 animate-fade-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-white">Customize Your Test Set</h2>
+                    <p class="text-xs text-slate-400">Select how many questions of each mathematical category you want in your rotation.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="resetCustomization()" class="px-3 py-1.5 text-xs font-semibold bg-slate-900 border border-slate-800 rounded-lg text-slate-400 hover:text-white transition">
+                        Reset Counts
+                    </button>
+                    <button onclick="presetQuickStart()" class="px-3 py-1.5 text-xs font-semibold bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-brand-400 hover:bg-brand-500/20 transition">
+                        Preset (Quick 5 Each)
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="customization-grid">
+                <!-- Dynamically populated category controls -->
+            </div>
+
+            <div class="flex items-center justify-end pt-6 border-t border-slate-900">
+                <button onclick="proceedToOverview()" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl transition shadow-lg shadow-indigo-600/10 flex items-center space-x-2">
+                    <span>Proceed to Overview</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- PLAY: OVERVIEW SCREEN -->
+        <section id="view-overview" class="hidden space-y-8 animate-fade-in max-w-2xl mx-auto">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl font-black text-white">Test Rotation Overview</h2>
+                <p class="text-xs text-slate-400">Here's a breakdown of the customized math assessment before you begin.</p>
+            </div>
+
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 space-y-4">
+                <div class="divide-y divide-slate-800" id="overview-items-list">
+                    <!-- Dynamic overview items row -->
+                </div>
+
+                <div class="pt-4 flex justify-between text-sm font-bold border-t border-slate-800 text-slate-200">
+                    <span>Total Question Volume</span>
+                    <span id="overview-total-count" class="text-indigo-400">0 Questions</span>
+                </div>
+                <div class="flex justify-between text-sm font-bold text-slate-200">
+                    <span>Estimated Max Duration</span>
+                    <span id="overview-total-duration" class="text-indigo-400">0 Seconds</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-4 pt-4">
+                <button onclick="navigateTo('customize')" class="px-5 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-850 text-slate-300 font-bold rounded-xl transition flex items-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    <span>Back to Customize</span>
+                </button>
+                <button onclick="startTestProcess()" class="flex-grow px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold rounded-xl transition shadow-lg shadow-emerald-600/10 flex items-center justify-center space-x-2">
+                    <span class="text-lg">Start Verbal Test</span>
+                    <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- ACTIVE TEST INTERFACE -->
+        <section id="view-test" class="hidden space-y-8 animate-fade-in max-w-3xl mx-auto">
+            <div class="flex items-center justify-between bg-slate-900/40 p-4 border border-slate-800/80 rounded-2xl">
+                <div class="flex items-center space-x-3">
+                    <span class="text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1 rounded-full font-bold uppercase tracking-wider" id="test-category-label">
+                        Category
+                    </span>
+                    <span class="text-xs text-slate-400 font-semibold" id="test-progress-counter">
+                        Question 1 of 10
+                    </span>
+                </div>
+                <div class="flex items-center space-x-2" id="timer-box">
+                    <div class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></div>
+                    <span class="text-sm font-bold text-rose-400 tracking-wider font-mono" id="test-timer-display">
+                        10s Left
+                    </span>
+                </div>
+            </div>
+
+            <!-- Question Display Box -->
+            <div class="relative bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-8 md:p-12 text-center shadow-2xl space-y-8 overflow-hidden min-h-[340px] flex flex-col justify-between">
+                <div class="absolute -top-12 -left-12 w-48 h-48 bg-indigo-500/5 rounded-full blur-2xl"></div>
+                <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-emerald-500/5 rounded-full blur-2xl"></div>
+
+                <div class="text-slate-500 text-xs tracking-widest uppercase font-bold" id="question-descriptor-sub">
+                    Solve the following expression
+                </div>
+
+                <div class="relative py-4">
+                    <h3 class="text-5xl md:text-7xl font-extrabold tracking-tight text-white select-none transition-all scale-100" id="test-question-string">
+                        0 + 0
+                    </h3>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center justify-center space-x-2" id="microphone-wave">
+                        <div class="flex items-end space-x-0.5 h-4 w-6 bg-transparent" id="sound-bars">
+                            <span class="w-1 bg-brand-500 h-1 rounded-full animate-pulse"></span>
+                            <span class="w-1 bg-brand-500 h-2 rounded-full animate-pulse"></span>
+                            <span class="w-1 bg-brand-500 h-3 rounded-full animate-pulse"></span>
+                            <span class="w-1 bg-brand-500 h-1 rounded-full animate-pulse"></span>
+                        </div>
+                        <span class="text-xs font-bold text-slate-400" id="mic-status-label">Voice Activated & Listening...</span>
+                    </div>
+
+                    <div class="bg-slate-950/80 border border-slate-800/80 rounded-2xl px-4 py-3 text-sm min-h-[50px] flex items-center justify-center text-center">
+                        <span class="text-indigo-300 font-medium italic" id="test-spoken-transcript">
+                            Speak your answer clearly...
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Immediate overlay for correct/incorrect -->
+                <div id="validation-overlay" class="absolute inset-0 bg-slate-950/90 backdrop-blur-sm hidden flex-col items-center justify-center space-y-3 animate-fade-in">
+                    <div class="w-16 h-16 rounded-full flex items-center justify-center text-white" id="validation-icon-box"></div>
+                    <h4 class="text-2xl font-black" id="validation-title">Correct Answer!</h4>
+                    <p class="text-sm text-slate-400 font-medium" id="validation-subtitle">Moving to next question in 1s...</p>
+                </div>
+            </div>
+
+            <!-- Manual Keyboard Input Fallback Option -->
+            <div class="bg-slate-900/20 border border-slate-800/50 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-3">
+                <div class="text-xs text-slate-400">
+                    <span class="font-bold text-slate-200">Tip:</span> If you cannot speak or speech is unsupported, you can type your answer here.
+                </div>
+                <div class="flex w-full md:w-auto space-x-2">
+                    <input type="text" id="manual-answer-input" placeholder="Type answer..." class="px-3 py-1.5 bg-slate-900 text-xs rounded-lg border border-slate-700 text-white focus:outline-none focus:border-indigo-500 w-full md:w-32">
+                    <button onclick="submitManualAnswer()" class="px-4 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-xs font-bold text-white rounded-lg transition">
+                        Submit
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Action controls -->
+            <div class="flex items-center justify-between pt-4">
+                <span class="text-xs text-slate-500">Note: Answer verifies instantly upon speaking!</span>
+                <button onclick="forceSubmitTest()" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl transition shadow-lg shadow-rose-600/10 flex items-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                    </svg>
+                    <span>Submit Test Now</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- TEST ASSESSMENT REPORT -->
+        <section id="view-report" class="hidden space-y-8 animate-fade-in max-w-2xl mx-auto">
+            <div class="text-center space-y-3">
+                <div class="inline-flex p-3 bg-emerald-500/10 rounded-full border border-emerald-500/20 text-emerald-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-extrabold text-white">Test Completed Successfully!</h2>
+                <p class="text-xs text-slate-400">Review your final assessment score and type-specific breakdown details below.</p>
+            </div>
+
+            <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-around gap-6 text-center md:text-left">
+                <div class="space-y-2">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-slate-400">Combined Accuracy</span>
+                    <h3 class="text-5xl md:text-6xl font-black text-indigo-400 font-mono" id="report-accuracy-percentage">0%</h3>
+                    <p class="text-xs text-slate-500" id="report-fraction-score">0 / 0 Questions Correct</p>
+                </div>
+                <div class="h-px w-full md:h-16 md:w-px bg-slate-800"></div>
+                <div class="space-y-1">
+                    <h4 class="text-md font-bold text-slate-100" id="report-feedback-title">Good Performance!</h4>
+                    <p class="text-xs text-slate-400 max-w-xs">Keep practicing regularly to build instant numerical fluency and reflexes.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 space-y-4">
+                <h3 class="text-sm font-extrabold text-slate-200">Accuracy Breakdown By Type</h3>
+                <div class="space-y-4" id="report-category-breakdown">
+                    <!-- Dynamic category bar elements -->
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-4 pt-4 border-t border-slate-900">
+                <button onclick="navigateTo('home')" class="px-5 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-850 text-slate-300 font-bold rounded-xl transition">
+                    Return Home
+                </button>
+                <div class="flex space-x-2">
+                    <button onclick="saveTestScoreMarkdown()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl transition shadow-lg shadow-indigo-600/15 flex items-center space-x-2">
+                        <span>Save Score to MD</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- APP SETTINGS PAGE -->
+        <section id="view-settings" class="hidden space-y-8 animate-fade-in">
+            <div class="pb-4 border-b border-slate-800">
+                <h2 class="text-2xl font-extrabold text-white">App Configurations</h2>
+                <p class="text-xs text-slate-400">Configure time ceilings per question or mute countdown limiters per category.</p>
+            </div>
+
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 space-y-6">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-100">Global Countdown Timers</h3>
+                        <p class="text-xs text-slate-400">Enable or disable timer-enforced limits across all tests.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="global-timer-toggle" class="sr-only peer" checked onchange="toggleGlobalTimerSetting()">
+                        <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                    </label>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Category Config Table</h4>
+                    <div class="divide-y divide-slate-800" id="settings-categories-list">
+                        <!-- Dynamic settings inputs -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end pt-4">
+                <button onclick="saveAllSettings()" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl transition shadow-lg shadow-indigo-600/10">
+                    Apply Settings
+                </button>
+            </div>
+        </section>
+
+        <!-- SCORE HISTORY & GRAPH PAGE -->
+        <section id="view-scores" class="hidden space-y-8 animate-fade-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-white">Scores Dashboard</h2>
+                    <p class="text-xs text-slate-400">Records written into virtual file <code class="text-indigo-400 font-mono text-[11px] bg-indigo-950/50 px-1.5 py-0.5 rounded border border-indigo-800/35">calculation_score.md</code>.</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="toggleScoreViewMode()" id="score-toggle-btn" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-xs font-bold text-white rounded-xl transition flex items-center space-x-2">
+                        📊 <span id="score-toggle-label">Graph View</span>
+                    </button>
+                    <button onclick="downloadRawMarkdown()" class="px-3 py-2 bg-slate-900 border border-slate-800 hover:text-white text-xs font-bold text-slate-400 rounded-xl transition">
+                        Export .md
+                    </button>
+                    <button onclick="clearScoreHistory()" class="px-3 py-2 bg-rose-950/20 hover:bg-rose-950/50 hover:text-rose-300 text-xs font-bold text-rose-400 rounded-xl transition">
+                        Clear Data
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <div id="score-table-container" class="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-950/60 border-b border-slate-800 text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">
+                                <th class="p-4">Date & Time</th>
+                                <th class="p-4">Total Q</th>
+                                <th class="p-4">Score</th>
+                                <th class="p-4">Accuracy</th>
+                                <th class="p-4">Category Breakdown</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scores-table-body" class="divide-y divide-slate-800/60 text-xs text-slate-300">
+                            <!-- Populated rows -->
+                        </tbody>
+                    </table>
+                    <div id="no-scores-indicator" class="hidden p-8 text-center text-slate-500 text-sm italic">
+                        No performance history records found. Start a new test to write score records!
+                    </div>
+                </div>
+
+                <div id="score-graph-container" class="hidden bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 space-y-6">
+                    <h3 class="text-sm font-bold text-slate-200">Historical Accuracy Trend Chart</h3>
+                    <div class="w-full h-64 bg-slate-950/50 border border-slate-800/50 rounded-xl relative flex items-center justify-center p-4">
+                        <div id="svg-chart-wrapper" class="w-full h-full"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- App Toast Message System -->
+    <div id="app-toast" class="fixed bottom-6 left-6 z-50 bg-slate-900 border border-indigo-500/50 text-white rounded-xl px-4 py-3 shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-2 text-xs font-bold">
+        <span id="toast-icon">ℹ️</span>
+        <span id="toast-message">Message details loaded</span>
+    </div>
+
+    <!-- Global Footer -->
+    <footer class="border-t border-slate-900 py-6 text-center text-slate-600 text-[11px] font-medium tracking-wide">
+        &copy; 2026 Calcu-Voice App. Engineered for Premium Mental Calculation Performance.
+    </footer>
+
+    <!-- Active State Logic Implementation Code -->
+    <script>
+        // सभी 16 कैटेगरीज़ का करंट डिफिकल्टी लेवल (1: आसान, 2: मीडियम, 3: कठिन)
+        let categoryDifficulty = JSON.parse(localStorage.getItem('categoryDifficulty')) || {
+            "Addition (1 Digit)": 2, "Addition": 2, "Addition (2 Digit)": 2, "Addition (3 Digit)": 2,
+            "Subtraction (1 Digit)": 2, "Subtraction": 2, "Subtraction (2 Digit)": 2, "Subtraction (3 Digit)": 2,
+            "Multiplication (1 Digit)": 2, "Multiplication": 2, "Multiplication (2 Digit)": 2,
+            "Division": 2, "Division (Perfect)": 2,
+            "Square Root (1-20)": 2, "Square Root (21-100)": 2,
+            "Cube Root (1-10)": 2, "Cube Root (11-50)": 2,
+            "Fractions": 2, "Percentage": 2, "Decimals": 2, "BODMAS Rules": 2
+        };
+        
+        // --- DATA SETUP ---
+        const categories = [
+            { id: "dd_add", name: "Addition (2 Digit)", desc: "Double digit + double digit addition", defaultCount: 5 },
+            { id: "tt_add", name: "Addition (3 Digit)", desc: "Triple digit + triple digit addition", defaultCount: 0 },
+            { id: "mix_add", name: "Mix Addition", desc: "Random 3 to 5 double/triple numbers", defaultCount: 0 },
+            { id: "num_sum", name: "Number Sum", desc: "Sum up all single digits of a generated number", defaultCount: 0 },
+            { id: "ds_mult", name: "Tables (11-30)", desc: "Multiplications of factors from 11 to 30", defaultCount: 0 },
+            { id: "dd_mult", name: "Multiplication (2 Digit)", desc: "Double digit × Double digit multiplication", defaultCount: 0 },
+            { id: "ts_mult", name: "T × S", desc: "Triple digit × Single digit multiplication", defaultCount: 0 },
+            { id: "square", name: "Square", desc: "Find square of numbers between 11 to 99", defaultCount: 0 },
+            { id: "square_root", name: "Square Root (21-100)", desc: "Find the square root of perfect squares between 21 to 100", defaultCount: 0 },
+            { id: "cube_root", name: "Cube Root (11-50)", desc: "Find the cube root of perfect cubes between 11 to 50", defaultCount: 0 },
+            { id: "lcm", name: "LCM", desc: "Least Common Multiple of two integers", defaultCount: 0 },
+            { id: "hcf", name: "HCF", desc: "Highest Common Factor of two integers", defaultCount: 0 },
+            { id: "percentage", name: "Percentage", desc: "Percent value calculations (e.g., 20% of 150)", defaultCount: 0 },
+            { id: "decimal", name: "Decimal Arithmetic", desc: "Addition / subtraction with decimals", defaultCount: 0 },
+            { id: "bodmas", name: "BODMAS Rules", desc: "Evaluate basic parenthetical equations", defaultCount: 0 },
+            { id: "one_dig_add", name: "Addition (1 Digit)", desc: "Single digit addition practice", defaultCount: 0 }
+        ];
+
+        let appSettings = {
+            categoryTimes: {},     
+            countdownEnabled: {},  
+            globalTimer: true     
+        };
+
+        let selectedCounts = {};    
+        let activeTestState = {
+            questions: [],
+            currentIndex: 0,
+            correctCount: 0,
+            scoresBreakdown: {}, 
+            currentQuestionTimer: null,
+            timeSpentSec: 0,
+            activeListening: false,
+            recognitionEngine: null
+        };
+
+        const defaultMarkdown = `# Calculation Scores History\n\n| Date & Time | Total Questions | Score | Accuracy | Breakdown |\n|---|---|---|---|---|\n`;
+
+        window.onload = function() {
+            initSettings();
+            resetCustomization();
+            renderCustomizationControls();
+            renderSettingsPage();
+            initSpeechEngine();
+            loadScoresHistory();
+        };
+
+        function showToast(icon, text) {
+            const toast = document.getElementById('app-toast');
+            document.getElementById('toast-icon').innerText = icon;
+            document.getElementById('toast-message').innerText = text;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function navigateTo(viewId) {
+            const views = ['home', 'customize', 'overview', 'test', 'report', 'settings', 'scores'];
+            views.forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+            });
+
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+
+            const navs = ['home', 'settings', 'scores'];
+            navs.forEach(nav => {
+                const btn = document.getElementById(`nav-${nav}`);
+                if (btn) {
+                    btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 text-slate-400 hover:text-white";
+                }
+            });
+
+            const activeNavBtn = document.getElementById(`nav-${viewId}`);
+            if (activeNavBtn) {
+                activeNavBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 text-brand-500 bg-indigo-500/10";
+            }
+
+            if (viewId !== 'test') {
+                stopSpeechRecognition();
+                clearInterval(activeTestState.currentQuestionTimer);
+            }
+
+            if (viewId === 'scores') {
+                loadScoresHistory();
+            }
+        }
+
+        function initSettings() {
+            categories.forEach(cat => {
+                appSettings.categoryTimes[cat.name] = 15; 
+                appSettings.countdownEnabled[cat.name] = true;
+            });
+
+            const savedSettings = localStorage.getItem('calcu_voice_settings');
+            if (savedSettings) {
+                appSettings = JSON.parse(savedSettings);
+            }
+        }
+
+        function resetCustomization() {
+            categories.forEach(cat => {
+                selectedCounts[cat.name] = cat.defaultCount;
+            });
+            renderCustomizationControls();
+        }
+
+        function presetQuickStart() {
+            categories.forEach(cat => {
+                selectedCounts[cat.name] = 5;
+            });
+            renderCustomizationControls();
+            showToast("🎮", "All categories set to 5 questions!");
+        }
+
+        function renderCustomizationControls() {
+            const grid = document.getElementById('customization-grid');
+            grid.innerHTML = '';
+
+            categories.forEach(cat => {
+                const count = selectedCounts[cat.name] || 0;
+                const card = document.createElement('div');
+                card.className = "p-4 bg-slate-900/30 border border-slate-800/80 rounded-2xl flex items-center justify-between transition hover:border-slate-700/80";
+                card.innerHTML = `
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-extrabold text-slate-100">${cat.name}</h3>
+                        <p class="text-[11px] text-slate-400 leading-tight">${cat.desc}</p>
+                    </div>
+                    <div class="flex items-center space-x-3 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+                        <button onclick="decrementCount('${cat.name}')" class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white flex items-center justify-center font-bold text-sm transition">-</button>
+                        <span class="w-6 text-center font-bold text-xs text-indigo-400 font-mono" id="count-display-${cat.id}">${count}</span>
+                        <button onclick="incrementCount('${cat.name}')" class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white flex items-center justify-center font-bold text-sm transition">+</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function incrementCount(catName) {
+            if (selectedCounts[catName] < 50) {
+                selectedCounts[catName]++;
+                updateCardDisplay(catName);
+            }
+        }
+
+        function decrementCount(catName) {
+            if (selectedCounts[catName] > 0) {
+                selectedCounts[catName]--;
+                updateCardDisplay(catName);
+            }
+        }
+
+        function updateCardDisplay(catName) {
+            const cat = categories.find(c => c.name === catName);
+            if (cat) {
+                const element = document.getElementById(`count-display-${cat.id}`);
+                if (element) {
+                    element.innerText = selectedCounts[catName];
+                }
+            }
+        }
+
+        function proceedToOverview() {
+            let totalSelected = 0;
+            categories.forEach(cat => {
+                totalSelected += selectedCounts[cat.name] || 0;
+            });
+
+            if (totalSelected === 0) {
+                showToast("⚠️", "Please select at least 1 question to start the test.");
+                return;
+            }
+
+            const listContainer = document.getElementById('overview-items-list');
+            listContainer.innerHTML = '';
+            
+            let calculatedTotalTime = 0;
+
+            categories.forEach(cat => {
+                const count = selectedCounts[cat.name] || 0;
+                if (count > 0) {
+                    const timePerQ = appSettings.categoryTimes[cat.name] || 15;
+                    const catTime = appSettings.countdownEnabled[cat.name] && appSettings.globalTimer ? (timePerQ * count) : 0;
+                    calculatedTotalTime += catTime;
+
+                    const row = document.createElement('div');
+                    row.className = "py-3 flex justify-between text-xs text-slate-300";
+                    row.innerHTML = `
+                        <span>${cat.name} <span class="text-slate-500">(${count} questions)</span></span>
+                        <span class="font-semibold text-slate-400">${catTime > 0 ? catTime + 's limit' : 'Unlimited'}</span>
+                    `;
+                    listContainer.appendChild(row);
+                }
+            });
+
+            document.getElementById('overview-total-count').innerText = `${totalSelected} Questions`;
+            document.getElementById('overview-total-duration').innerText = calculatedTotalTime > 0 ? `${calculatedTotalTime} Seconds` : 'No limits applied';
+
+            navigateTo('overview');
+        }
+
+        function renderSettingsPage() {
+            const list = document.getElementById('settings-categories-list');
+            list.innerHTML = '';
+
+            document.getElementById('global-timer-toggle').checked = appSettings.globalTimer;
+
+            categories.forEach(cat => {
+                const time = appSettings.categoryTimes[cat.name] || 15;
+                const active = appSettings.countdownEnabled[cat.name];
+
+                const row = document.createElement('div');
+                row.className = "py-4 flex flex-col md:flex-row md:items-center justify-between gap-4";
+                row.innerHTML = `
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-200">${cat.name} Timer</h4>
+                        <p class="text-[10px] text-slate-500">${cat.desc}</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[10px] text-slate-400">Time per Q:</span>
+                            <input type="number" id="setting-time-${cat.id}" value="${time}" min="5" max="120" class="w-16 px-2 py-1 bg-slate-950 border border-slate-800 rounded text-center text-xs text-indigo-400 font-mono">
+                            <span class="text-[10px] text-slate-400">sec</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="setting-active-${cat.id}" class="sr-only peer" ${active ? 'checked' : ''}>
+                            <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-600"></div>
+                        </label>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function toggleGlobalTimerSetting() {
+            appSettings.globalTimer = document.getElementById('global-timer-toggle').checked;
+        }
+
+        function saveAllSettings() {
+            categories.forEach(cat => {
+                const timeInput = document.getElementById(`setting-time-${cat.id}`);
+                const activeInput = document.getElementById(`setting-active-${cat.id}`);
+
+                if (timeInput) {
+                    appSettings.categoryTimes[cat.name] = parseInt(timeInput.value) || 15;
+                }
+                if (activeInput) {
+                    appSettings.countdownEnabled[cat.name] = activeInput.checked;
+                }
+            });
+
+            localStorage.setItem('calcu_voice_settings', JSON.stringify(appSettings));
+            showToast("⚙️", "Settings updated successfully!");
+            navigateTo('home');
+        }
+
+        // --- MATH ENGINE GENERATORS ---
+        function getGCD(a, b) {
+            while (b) {
+                let t = b;
+                b = a % b;
+                a = t;
+            }
+            return a;
+        }
+
+        function getLCM(a, b) {
+            return (a * b) / getGCD(a, b);
+        }
+
+        function generateArithmeticExpression(categoryName) {
+            let questionText = '';
+            let correctAnswer = 0;
+            
+            const level = categoryDifficulty[categoryName] || 2;
+
+            switch(categoryName) {
+                // ================= 1. ADDITION MODES =================
+                case "Addition (1 Digit)": {
+                    let max = (level === 1) ? 4 : (level === 2) ? 7 : 9;
+                    const num1 = Math.floor(Math.random() * max) + 1;
+                    const num2 = Math.floor(Math.random() * max) + 1;
+                    questionText = `${num1} + ${num2}`;
+                    correctAnswer = num1 + num2;
+                    break;
+                }
+                case "D + D":
+                case "Addition":
+                case "Addition (2 Digit)": {
+                    let min1 = 10, max1 = 99, min2 = 10, max2 = 99;
+                    if (level === 1) { max1 = 40; max2 = 40; } 
+                    else if (level === 3) { min1 = 60; min2 = 60; } 
+                    
+                    const num1 = Math.floor(Math.random() * (max1 - min1 + 1)) + min1;
+                    const num2 = Math.floor(Math.random() * (max2 - min2 + 1)) + min2;
+                    questionText = `${num1} + ${num2}`;
+                    correctAnswer = num1 + num2;
+                    break;
+                }
+                case "T + T":
+                case "Addition (3 Digit)": {
+                    let min = 100, max = 999;
+                    if (level === 1) max = 400;
+                    else if (level === 3) min = 600;
+                    const num1 = Math.floor(Math.random() * (max - min + 1)) + min;
+                    const num2 = Math.floor(Math.random() * (max - min + 1)) + min;
+                    questionText = `${num1} + ${num2}`;
+                    correctAnswer = num1 + num2;
+                    break;
+                }
+                case "Mix Addition": {
+                    const termsCount = (level === 1) ? 3 : (level === 2) ? 4 : 5;
+                    const terms = [];
+                    for(let i=0; i<termsCount; i++) {
+                        terms.push(Math.floor(Math.random() * 90) + 10);
+                    }
+                    questionText = terms.join(" + ");
+                    correctAnswer = terms.reduce((acc, curr) => acc + curr, 0);
+                    break;
+                }
+                case "Number Sum": {
+                    const digitsCount = (level === 1) ? 5 : (level === 2) ? 7 : 9;
+                    let strNum = "";
+                    let sum = 0;
+                    for (let i = 0; i < digitsCount; i++) {
+                        const digit = Math.floor(Math.random() * 9) + 1;
+                        strNum += digit;
+                        sum += digit;
+                    }
+                    questionText = `Sum digits of: ${strNum}`;
+                    correctAnswer = sum;
+                    break;
+                }
+
+                // ================= 2. SUBTRACTION MODES =================
+                case "Subtraction (1 Digit)": {
+                    const num1 = (level === 1) ? Math.floor(Math.random() * 5) + 5 : Math.floor(Math.random() * 6) + 4;
+                    const num2 = Math.floor(Math.random() * num1) + 1;
+                    questionText = `${num1} - ${num2}`;
+                    correctAnswer = num1 - num2;
+                    break;
+                }
+                case "Subtraction":
+                case "Subtraction (2 Digit)": {
+                    let min = 10, max = 99;
+                    if (level === 1) { max = 50; } 
+                    else if (level === 3) { min = 50; }
+                    let num1 = Math.floor(Math.random() * (max - min + 1)) + min;
+                    let num2 = Math.floor(Math.random() * (num1 - min + 1)) + min;
+                    
+                    if (level === 1 && (num1 % 10) < (num2 % 10)) {
+                        let temp = num1; num1 = num2; num2 = temp; 
+                    }
+                    const maxNum = Math.max(num1, num2);
+                    const minNum = Math.min(num1, num2);
+                    questionText = `${maxNum} - ${minNum}`;
+                    correctAnswer = maxNum - minNum;
+                    break;
+                }
+                case "Subtraction (3 Digit)": {
+                    let min = 100, max = 999;
+                    if (level === 1) max = 500;
+                    else if (level === 3) min = 500;
+                    const num1 = Math.floor(Math.random() * (max - min + 1)) + min;
+                    const num2 = Math.floor(Math.random() * (num1 - min + 1)) + min;
+                    const maxNum = Math.max(num1, num2);
+                    const minNum = Math.min(num1, num2);
+                    questionText = `${maxNum} - ${minNum}`;
+                    correctAnswer = maxNum - minNum;
+                    break;
+                }
+
+                // ================= 3. MULTIPLICATION MODES =================
+                case "Multiplication (1 Digit)": {
+                    let max = (level === 1) ? 5 : 9;
+                    const num1 = Math.floor(Math.random() * max) + 1;
+                    const num2 = Math.floor(Math.random() * max) + 1;
+                    questionText = `${num1} × ${num2}`;
+                    correctAnswer = num1 * num2;
+                    break;
+                }
+                case "D × S":
+                case "Tables (11-30)": {
+                    let n1_min = 11, n1_max = 30;
+                    let n2_max = (level === 1) ? 5 : (level === 2) ? 7 : 9;
+                    const num1 = Math.floor(Math.random() * (n1_max - n1_min + 1)) + n1_min;
+                    const num2 = Math.floor(Math.random() * (n2_max - 2 + 1)) + 2;
+                    questionText = `${num1} × ${num2}`;
+                    correctAnswer = num1 * num2;
+                    break;
+                }
+                case "Multiplication":
+                case "D × D":
+                case "Multiplication (2 Digit)": {
+                    let n1_min = 11, n1_max = 19, n2_min = 2, n2_max = 9; 
+                    if (level === 1) { n1_max = 12; n2_max = 5; } 
+                    else if (level === 3) { n1_min = 12; n1_max = 50; n2_min = 11; n2_max = 19; } 
+                    
+                    const num1 = Math.floor(Math.random() * (n1_max - n1_min + 1)) + n1_min;
+                    const num2 = Math.floor(Math.random() * (n2_max - n2_min + 1)) + n2_min;
+                    questionText = `${num1} × ${num2}`;
+                    correctAnswer = num1 * num2;
+                    break;
+                }
+                case "T × S": {
+                    let min = 100, max = 500;
+                    if (level === 3) max = 999;
+                    const num1 = Math.floor(Math.random() * (max - min + 1)) + min;
+                    const num2 = Math.floor(Math.random() * 8) + 2;
+                    questionText = `${num1} × ${num2}`;
+                    correctAnswer = num1 * num2;
+                    break;
+                }
+                case "Square": {
+                    let min = 11, max = 30;
+                    if (level === 2) max = 60;
+                    if (level === 3) max = 99;
+                    const a = Math.floor(Math.random() * (max - min + 1)) + min; 
+                    questionText = `${a}²`;
+                    correctAnswer = a * a;
+                    break;
+                }
+
+                // ================= 4. DIVISION MODES =================
+                case "Division":
+                case "Division (Perfect)": {
+                    let base_min = 2, base_max = 10, mult_min = 2, mult_max = 10;
+                    if (level === 1) { base_max = 5; mult_max = 5; }
+                    else if (level === 3) { base_min = 11; base_max = 20; mult_min = 5; mult_max = 12; }
+                    
+                    const divisor = Math.floor(Math.random() * (base_max - base_min + 1)) + base_min;
+                    const quotient = Math.floor(Math.random() * (mult_max - mult_min + 1)) + mult_min;
+                    const dividend = divisor * quotient;
+                    
+                    questionText = `${dividend} ÷ ${divisor}`;
+                    correctAnswer = quotient;
+                    break;
+                }
+
+                // ================= 5. ROOT MODES =================
+                case "Square Root (1-20)": {
+                    let min = 1, max = 20;
+                    if (level === 1) max = 10;
+                    else if (level === 3) min = 11;
+                    const base = Math.floor(Math.random() * (max - min + 1)) + min;
+                    questionText = `√${base * base}`;
+                    correctAnswer = base;
+                    break;
+                }
+                case "Square Root (21-100)": {
+                    let min = 21, max = 100;
+                    if (level === 1) max = 50; 
+                    else if (level === 3) min = 70; 
+                    const base = Math.floor(Math.random() * (max - min + 1)) + min;
+                    questionText = `√${base * base}`;
+                    correctAnswer = base;
+                    break;
+                }
+                case "Cube Root (1-10)": {
+                    let min = 1, max = 10;
+                    if (level === 1) max = 5;
+                    else if (level === 3) min = 6;
+                    const base = Math.floor(Math.random() * (max - min + 1)) + min;
+                    questionText = `∛${base * base * base}`;
+                    correctAnswer = base;
+                    break;
+                }
+                case "Cube Root (11-50)": {
+                    let min = 11, max = 50;
+                    if (level === 1) max = 25; 
+                    else if (level === 3) min = 35; 
+                    const base = Math.floor(Math.random() * (max - min + 1)) + min;
+                    questionText = `∛${base * base * base}`;
+                    correctAnswer = base;
+                    break;
+                }
+
+                // ================= 6. ADVANCED MODES =================
+                case "LCM": {
+                    let max = (level === 1) ? 10 : (level === 2) ? 16 : 25;
+                    const a = Math.floor(Math.random() * (max - 4 + 1)) + 4; 
+                    const b = Math.floor(Math.random() * (max - 4 + 1)) + 4; 
+                    questionText = `LCM of (${a}, ${b})`;
+                    correctAnswer = getLCM(a, b);
+                    break;
+                }
+                case "HCF": {
+                    let max = (level === 1) ? 40 : (level === 2) ? 80 : 120;
+                    const a = Math.floor(Math.random() * (max - 12 + 1)) + 12; 
+                    const b = Math.floor(Math.random() * (max - 12 + 1)) + 12; 
+                    questionText = `HCF of (${a}, ${b})`;
+                    correctAnswer = getGCD(a, b);
+                    break;
+                }
+                case "Fractions": {
+                    if (level === 1) {
+                        const den = Math.floor(Math.random() * 4) + 2; 
+                        const num1 = Math.floor(Math.random() * 3) + 1;
+                        const num2 = Math.floor(Math.random() * 3) + 1;
+                        questionText = `${num1}/${den} + ${num2}/${den}`;
+                        correctAnswer = parseFloat(((num1 + num2) / den).toFixed(2));
+                    } else {
+                        const den1 = Math.floor(Math.random() * 4) + 2;
+                        const den2 = Math.floor(Math.random() * 4) + 2;
+                        const num1 = Math.floor(Math.random() * 3) + 1;
+                        const num2 = Math.floor(Math.random() * 3) + 1;
+                        questionText = `${num1}/${den1} + ${num2}/${den2}`;
+                        correctAnswer = parseFloat(((num1 / den1) + (num2 / den2)).toFixed(2));
+                    }
+                    break;
+                }
+                case "Percentage": {
+                    let base = (level === 1) ? 100 : (level === 2) ? 50 : 25;
+                    let pct = (level === 1) ? 10 : (level === 2) ? 20 : 15;
+                    let num = Math.floor(Math.random() * 5) + 1;
+                    let finalNum = base * num; 
+                    questionText = `${pct}% of ${finalNum}`;
+                    correctAnswer = parseFloat(((pct / 100) * finalNum).toFixed(2));
+                    break;
+                }
+                case "Decimal Arithmetic":
+                case "Decimals": {
+                    let num1 = parseFloat((Math.random() * 9 + 1).toFixed(level === 1 ? 1 : 2));
+                    let num2 = parseFloat((Math.random() * 9 + 1).toFixed(level === 1 ? 1 : 2));
+                    questionText = `${num1} + ${num2}`;
+                    correctAnswer = parseFloat((num1 + num2).toFixed(2));
+                    break;
+                }
+                case "BODMAS Rules": 
+                default: {
+                    if (level === 1) {
+                        questionText = "2 × 3 + 4";
+                        correctAnswer = 10;
+                    } else if (level === 2) {
+                        questionText = "12 ÷ 3 + 5 × 2";
+                        correctAnswer = 14;
+                    } else {
+                        questionText = "(15 + 5) ÷ 4 × 9";
+                        correctAnswer = 45;
+                    }
+                    break;
+                }
+            }
+            
+            return { questionText, correctAnswer };
+        }
+
+        function startTestProcess() {
+            activeTestState.questions = [];
+            activeTestState.currentIndex = 0;
+            activeTestState.correctCount = 0;
+            activeTestState.scoresBreakdown = {};
+
+            categories.forEach(cat => {
+                const count = selectedCounts[cat.name] || 0;
+                if (count > 0) {
+                    activeTestState.scoresBreakdown[cat.name] = {
+                        correct: 0,
+                        total: count
+                    };
+                    for (let i = 0; i < count; i++) {
+                        const { questionText, correctAnswer } = generateArithmeticExpression(cat.name);
+                        activeTestState.questions.push({
+                            category: cat.name,
+                            question: questionText,
+                            correctAnswer: correctAnswer
+                        });
+                    }
+                }
+            });
+
+            activeTestState.questions.sort(() => Math.random() - 0.5);
+
+            navigateTo('test');
+            loadCurrentQuestion();
+        }
+
+        function loadCurrentQuestion() {
+            clearInterval(activeTestState.currentQuestionTimer);
+
+            if (activeTestState.currentIndex >= activeTestState.questions.length) {
+                finishTestRun();
+                return;
+            }
+
+            document.getElementById('validation-overlay').classList.add('hidden');
+            document.getElementById('manual-answer-input').value = "";
+            document.getElementById('test-spoken-transcript').innerText = "अपनी आवाज़ में साफ जवाब बोलें...";
+            document.getElementById('test-spoken-transcript').className = "text-indigo-300 font-medium italic";
+
+            const curQ = activeTestState.questions[activeTestState.currentIndex];
+            
+            document.getElementById('test-category-label').innerText = curQ.category;
+            document.getElementById('test-progress-counter').innerText = `Question ${activeTestState.currentIndex + 1} of ${activeTestState.questions.length}`;
+            document.getElementById('test-question-string').innerText = curQ.question;
+
+            const isTimerActive = appSettings.globalTimer && appSettings.countdownEnabled[curQ.category];
+            const maxDuration = appSettings.categoryTimes[curQ.category] || 15;
+
+            if (isTimerActive) {
+                document.getElementById('timer-box').classList.remove('hidden');
+                let countRemaining = maxDuration;
+                document.getElementById('test-timer-display').innerText = `${countRemaining}s Left`;
+
+                activeTestState.currentQuestionTimer = setInterval(() => {
+                    countRemaining--;
+                    document.getElementById('test-timer-display').innerText = `${countRemaining}s Left`;
+                    if (countRemaining <= 0) {
+                        clearInterval(activeTestState.currentQuestionTimer);
+                        handleAnswerValidation(false, "समय समाप्त!");
+                    }
+                }, 1000);
+            } else {
+                document.getElementById('timer-box').classList.add('hidden');
+            }
+
+            startSpeechRecognition();
+        }
+
+        function playFeedbackBeep(success) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                if (success) {
+                    osc.frequency.setValueAtTime(587.33, ctx.currentTime); 
+                    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); 
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.15);
+                } else {
+                    osc.frequency.setValueAtTime(220, ctx.currentTime); 
+                    osc.frequency.setValueAtTime(146.83, ctx.currentTime + 0.1); 
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.25);
+                }
+            } catch(e) {
+                console.log("Audio failed to load safely", e);
+            }
+        }
+
+        function handleAnswerValidation(isCorrect, debugMsg) {
+            clearInterval(activeTestState.currentQuestionTimer);
+            
+            const curQ = activeTestState.questions[activeTestState.currentIndex];
+            const currentCategory = curQ.category; 
+
+            if (isCorrect) {
+                activeTestState.correctCount++;
+                if (activeTestState.scoresBreakdown[currentCategory]) {
+                    activeTestState.scoresBreakdown[currentCategory].correct++;
+                }
+                if (categoryDifficulty[currentCategory] < 3) {
+                    categoryDifficulty[currentCategory] += 1;
+                }
+            } else {
+                if (categoryDifficulty[currentCategory] > 1) {
+                    categoryDifficulty[currentCategory] -= 1;
+                }
+            }
+
+            localStorage.setItem('categoryDifficulty', JSON.stringify(categoryDifficulty));
+            playFeedbackBeep(isCorrect);
+
+            const overlay = document.getElementById('validation-overlay');
+            const titleEl = document.getElementById('validation-title');
+            const subEl = document.getElementById('validation-subtitle');
+            const iconBox = document.getElementById('validation-icon-box');
+
+            if (isCorrect) {
+                overlay.className = "absolute inset-0 bg-slate-950/95 backdrop-blur-sm flex flex-col items-center justify-center space-y-3 animate-fade-in";
+                iconBox.className = "w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-2xl font-bold";
+                iconBox.innerHTML = `✓`;
+                titleEl.className = "text-2xl font-black text-emerald-400";
+                titleEl.innerText = "सही जवाब!";
+                subEl.innerText = debugMsg || "सफलतापूर्वक वेरिफाई हुआ";
+            } else {
+                overlay.className = "absolute inset-0 bg-slate-950/95 backdrop-blur-sm flex flex-col items-center justify-center space-y-3 animate-fade-in";
+                iconBox.className = "w-16 h-16 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center text-2xl font-bold";
+                iconBox.innerHTML = `✗`;
+                titleEl.className = "text-2xl font-black text-rose-400";
+                titleEl.innerText = debugMsg === "समय समाप्त!" ? "समय समाप्त!" : "गलत जवाब";
+                subEl.innerHTML = `सही जवाब था: <span class="font-bold text-white font-mono">${curQ.correctAnswer}</span>`;
+            }
+
+            overlay.classList.remove('hidden');
+
+            setTimeout(() => {
+                activeTestState.currentIndex++;
+                loadCurrentQuestion();
+            }, 1200);
+        }
+
+        function submitManualAnswer() {
+            const val = document.getElementById('manual-answer-input').value.trim();
+            if (val === "") return;
+
+            const curQ = activeTestState.questions[activeTestState.currentIndex];
+            const parsedInput = parseFloat(val);
+            const isCorrect = Math.abs(parsedInput - curQ.correctAnswer) < 0.01;
+
+            handleAnswerValidation(isCorrect, isCorrect ? "टेक्स्ट इनपुट से वेरिफाई हुआ" : "वेरिफिकेशन पूर्ण");
+        }
+
+        function forceSubmitTest() {
+            clearInterval(activeTestState.currentQuestionTimer);
+            stopSpeechRecognition();
+            finishTestRun();
+        }
+
+        function finishTestRun() {
+            navigateTo('report');
+
+            const total = activeTestState.questions.length;
+            const correct = activeTestState.correctCount;
+            const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+            document.getElementById('report-accuracy-percentage').innerText = `${percentage}%`;
+            document.getElementById('report-fraction-score').innerText = `${correct} / ${total} Questions Correct`;
+
+            const titleEl = document.getElementById('report-feedback-title');
+            if (percentage === 100) {
+                titleEl.innerText = "🌟 शत-प्रतिशत परफेक्ट!";
+            } else if (percentage >= 80) {
+                titleEl.innerText = "🔥 बेमिसाल स्पीड और एक्यूरेसी!";
+            } else if (percentage >= 50) {
+                titleEl.innerText = "📈 बहुत बढ़िया, अभ्यास जारी रखें!";
+            } else {
+                titleEl.innerText = "💪 ध्यान दें और दोबारा प्रयास करें!";
+            }
+
+            const breakdownContainer = document.getElementById('report-category-breakdown');
+            breakdownContainer.innerHTML = '';
+
+            Object.keys(activeTestState.scoresBreakdown).forEach(catName => {
+                const metric = activeTestState.scoresBreakdown[catName];
+                const catPercentage = metric.total > 0 ? Math.round((metric.correct / metric.total) * 100) : 0;
+
+                const card = document.createElement('div');
+                card.className = "space-y-1.5";
+                card.innerHTML = `
+                    <div class="flex justify-between text-xs font-semibold">
+                        <span class="text-slate-300">${catName}</span>
+                        <span class="text-slate-400 font-mono">${metric.correct} / ${metric.total} correct (${catPercentage}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                        <div class="bg-indigo-500 h-full rounded-full" style="width: ${catPercentage}%"></div>
+                    </div>
+                `;
+                breakdownContainer.appendChild(card);
+            });
+        }
+
+        // --- HINDI / ENGLISH WORD TO NUMBER PARSE DICTIONARY ---
+        function parseWordToDigit(word) {
+            const units = {
+                'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9,
+                'ten': 10, 'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15, 'sixteen': 16,
+                'seventeen': 17, 'eighteen': 18, 'nineteen': 19,
+                'शून्य': 0, 'एक': 1, 'दो': 2, 'तीन': 3, 'चार': 4, 'पांच': 5, 'छह': 6, 'सात': 7, 'आठ': 8, 'नौ': 9, 'दस': 10
+            };
+            const tens = {
+                'twenty': 20, 'thirty': 30, 'forty': 40, 'fifty': 50, 'sixty': 60, 'seventy': 70, 'eighty': 80, 'ninety': 90,
+                'बीस': 20, 'तीस': 30, 'चालीस': 40, 'पचास': 50, 'साठ': 60, 'सत्तर': 70, 'अस्सी': 80, 'नब्बे': 90
+            };
+            const scales = {
+                'hundred': 100, 'thousand': 1000, 'सौ': 100, 'हजार': 1000
+            };
+
+            const cleanWord = word.toLowerCase().trim();
+            if (units[cleanWord] !== undefined) return { val: units[cleanWord], type: 'unit' };
+            if (tens[cleanWord] !== undefined) return { val: tens[cleanWord], type: 'ten' };
+            if (scales[cleanWord] !== undefined) return { val: scales[cleanWord], type: 'scale' };
+
+            return null;
+        }
+
+        function reconstructSpokenNumber(text) {
+            let clean = text.toLowerCase().trim()
+                .replace(/[^a-zA-Z0-9\s.\u0900-\u097F]/g, '') 
+                .replace(/\bto\b/g, 'two')
+                .replace(/\btoo\b/g, 'two')
+                .replace(/\bfor\b/g, 'four')
+                .replace(/\bpoint\b/g, '.')
+                .replace(/\bदशमलव\b/g, '.')
+                .replace(/\broot\b/g, '')
+                .replace(/\bरूट\b/g, '')
+                .replace(/\bcube\b/g, '')
+                .replace(/\bक्यूब\b/g, '')
+                .replace(/\band\b/g, ''); 
+
+            const words = clean.split(/\s+/);
+            
+            const directMatch = clean.match(/[\d.]+/);
+            if (directMatch) {
+                const val = parseFloat(directMatch[0]);
+                if (!isNaN(val)) return val;
+            }
+
+            let isConsecutiveSequence = true;
+            let digitSequenceStr = "";
+            for (let i = 0; i < words.length; i++) {
+                const parsed = parseWordToDigit(words[i]);
+                if (parsed && parsed.type === 'unit') {
+                    digitSequenceStr += parsed.val;
+                } else if (words[i] === '.') {
+                    digitSequenceStr += '.';
+                } else {
+                    isConsecutiveSequence = false;
+                    break;
+                }
+            }
+            if (isConsecutiveSequence && digitSequenceStr !== "") {
+                const val = parseFloat(digitSequenceStr);
+                if (!isNaN(val)) return val;
+            }
+
+            let compoundList = [];
+            let activeSegment = 0;
+            for (let i = 0; i < words.length; i++) {
+                const w = words[i];
+                const parsed = parseWordToDigit(w);
+                if (parsed) {
+                    if (parsed.type === 'ten' || parsed.type === 'unit') {
+                        activeSegment += parsed.val;
+                    } else if (parsed.type === 'scale') {
+                        activeSegment = (activeSegment === 0 ? 1 : activeSegment) * parsed.val;
+                        compoundList.push(activeSegment);
+                        activeSegment = 0;
+                    }
+                }
+            }
+            if (activeSegment > 0) {
+                compoundList.push(activeSegment);
+            }
+
+            if (compoundList.length > 0) {
+                const sum = compoundList.reduce((acc, c) => acc + c, 0);
+                const concatStr = compoundList.map(v => String(v)).join('');
+                const concatVal = parseFloat(concatStr);
+                return { sum, concatVal };
+            }
+
+            return null;
+        }
+                
+        function verifyVerbalResponse(transcript, actualAns) {
+            const parsedObj = reconstructSpokenNumber(transcript);
+            if (parsedObj === null) return false;
+
+            const actualNum = parseFloat(actualAns);
+
+            if (typeof parsedObj === 'number') {
+                return Math.abs(parsedObj - actualNum) < 0.01;
+            }
+
+            if (parsedObj.sum !== undefined) {
+                if (Math.abs(parsedObj.sum - actualNum) < 0.01) return true;
+                if (parsedObj.concatVal !== undefined && Math.abs(parsedObj.concatVal - actualNum) < 0.01) return true;
+            }
+
+            return false;
+        }
+
+        // --- WEB SPEECH INTEGRATION CAPABILITIES ---
+        function initSpeechEngine() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                document.getElementById('microphone-wave').innerHTML = `
+                    <span class="text-xs text-rose-400 font-bold">⚠️ Speech Recognition is not supported on this browser. Please use manual fallback below.</span>
+                `;
+                return;
+            }
+
+            const rec = new SpeechRecognition();
+            rec.continuous = true;
+            rec.interimResults = true;
+            rec.lang = 'hi-IN'; 
+
+            rec.onstart = function() {
+                activeTestState.activeListening = true;
+                document.getElementById('mic-status-label').innerText = "वॉयस इंजन सक्रिय है: बोलिए (Hindi/English Support)...";
+                document.getElementById('mic-status-label').className = "text-xs font-bold text-emerald-400";
+            };
+
+            rec.onresult = function(event) {
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    }
+                }
+
+                if (finalTranscript !== '') {
+                    document.getElementById('test-spoken-transcript').innerText = `"${finalTranscript.trim()}"`;
+                    document.getElementById('test-spoken-transcript').className = "text-indigo-400 font-bold";
+
+                    const curQ = activeTestState.questions[activeTestState.currentIndex];
+                    const matched = verifyVerbalResponse(finalTranscript, curQ.correctAnswer);
+
+                    if (matched) {
+                        handleAnswerValidation(true, `Verified speech match: "${finalTranscript.trim()}"`);
+                    } else {
+                        const parsedValue = reconstructSpokenNumber(finalTranscript);
+                        if (parsedValue !== null) {
+                            handleAnswerValidation(false);
+                        }
+                    }
+                }
+            };
+
+            rec.onerror = function(event) {
+                console.log("Speech Engine Error:", event.error);
+                if (event.error === 'not-allowed') {
+                    document.getElementById('mic-status-label').innerText = "Mic blocked. Check site permissions.";
+                    document.getElementById('mic-status-label').className = "text-xs font-bold text-rose-400";
+                }
+            };
+
+            rec.onend = function() {
+                activeTestState.activeListening = false;
+                
+                const testView = document.getElementById('view-test');
+                const isOverlayHidden = document.getElementById('validation-overlay').classList.contains('hidden');
+                
+                if (testView && !testView.classList.contains('hidden') && isOverlayHidden) {
+                    try {
+                        rec.start();
+                        activeTestState.activeListening = true;
+                        document.getElementById('mic-status-label').innerText = "वॉयस इंजन सक्रिय है: बोलिए...";
+                        document.getElementById('mic-status-label').className = "text-xs font-bold text-emerald-400";
+                    } catch(e) {
+                        console.log("Mic auto-restart bypassed");
+                    }
+                } else {
+                    document.getElementById('mic-status-label').innerText = "Voice engine sleep mode";
+                    document.getElementById('mic-status-label').className = "text-xs font-bold text-slate-500";
+                }
+            };
+
+            activeTestState.recognitionEngine = rec;
+        }
+
+        function startSpeechRecognition() {
+            if (activeTestState.recognitionEngine && !activeTestState.activeListening) {
+                try {
+                    activeTestState.recognitionEngine.start();
+                } catch(e) {
+                    console.log("Recognition auto start overlap bypassed");
+                }
+            }
+        }
+
+        function stopSpeechRecognition() {
+            if (activeTestState.recognitionEngine && activeTestState.activeListening) {
+                activeTestState.recognitionEngine.stop();
+            }
+        }
+
+        // --- MARKDOWN LOGGING & RECOVERY ---
+        function saveTestScoreMarkdown() {
+            const date = new Date();
+            const formattedDate = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+            
+            const total = activeTestState.questions.length;
+            const correct = activeTestState.correctCount;
+            const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+            const breakdowns = [];
+            Object.keys(activeTestState.scoresBreakdown).forEach(cat => {
+                const metric = activeTestState.scoresBreakdown[cat];
+                const catPct = metric.total > 0 ? Math.round((metric.correct / metric.total) * 100) : 0;
+                breakdowns.push(`${cat}: ${catPct}%`);
+            });
+            const breakdownStr = breakdowns.join(", ");
+
+            const newRow = `| ${formattedDate} | ${total} | ${correct}/${total} | ${percentage}% | ${breakdownStr} |\n`;
+
+            let fileContent = localStorage.getItem('calculation_score_md') || defaultMarkdown;
+            fileContent += newRow;
+
+            localStorage.setItem('calculation_score_md', fileContent);
+            showToast("💾", "Score successfully appended to calculation_score.md!");
+
+            navigateTo('scores');
+        }
+
+        function loadScoresHistory() {
+            const fileContent = localStorage.getItem('calculation_score_md') || defaultMarkdown;
+            const parsedRecords = parseMarkdownTable(fileContent);
+
+            const tbody = document.getElementById('scores-table-body');
+            tbody.innerHTML = '';
+
+            if (parsedRecords.length === 0) {
+                document.getElementById('no-scores-indicator').classList.remove('hidden');
+                document.getElementById('score-table-container').classList.add('border-slate-800/20');
+                renderGraphView([]); 
+                return;
+            }
+
+            document.getElementById('no-scores-indicator').classList.add('hidden');
+            document.getElementById('score-table-container').classList.remove('border-slate-800/20');
+
+            parsedRecords.reverse().forEach(rec => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/30 transition border-b border-slate-800/40";
+                tr.innerHTML = `
+                    <td class="p-4 font-semibold text-slate-100">${rec.dateTime}</td>
+                    <td class="p-4 font-mono">${rec.total}</td>
+                    <td class="p-4 font-mono font-bold text-slate-200">${rec.score}</td>
+                    <td class="p-4 font-mono font-extrabold text-indigo-400">${rec.accuracy}</td>
+                    <td class="p-4 text-slate-400 leading-normal max-w-xs truncate" title="${rec.breakdown}">${rec.breakdown}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            renderGraphView(parsedRecords.reverse()); 
+        }
+
+        function parseMarkdownTable(md) {
+            const records = [];
+            const lines = md.split('\n');
+            for (let line of lines) {
+                if (line.trim().startsWith('|') && !line.includes('Date & Time') && !line.includes('---')) {
+                    const parts = line.split('|').map(p => p.trim());
+                    if (parts.length >= 6) {
+                        records.push({
+                            dateTime: parts[1],
+                            total: parts[2],
+                            score: parts[3],
+                            accuracy: parts[4],
+                            breakdown: parts[5]
+                        });
+                    }
+                }
+            }
+            return records;
+        }
+
+        function toggleScoreViewMode() {
+            const table = document.getElementById('score-table-container');
+            const graph = document.getElementById('score-graph-container');
+            const label = document.getElementById('score-toggle-label');
+
+            if (table.classList.contains('hidden')) {
+                table.classList.remove('hidden');
+                graph.classList.add('hidden');
+                label.innerText = "Graph View";
+            } else {
+                table.classList.add('hidden');
+                graph.classList.remove('hidden');
+                label.innerText = "Table View";
+            }
+        }
+
+        function renderGraphView(records) {
+            const wrapper = document.getElementById('svg-chart-wrapper');
+            if(!wrapper) return;
+            wrapper.innerHTML = '';
+
+            if (records.length === 0) {
+                wrapper.innerHTML = `<p class="text-xs text-slate-500 italic">Play some tests to render performance tracking curves!</p>`;
+                return;
+            }
+
+            const dataPoints = records.map(r => {
+                return parseFloat(r.accuracy.replace('%', '')) || 0;
+            });
+
+            const width = wrapper.clientWidth || 600;
+            const height = 220;
+            const padding = 35;
+
+            const xStep = (width - padding * 2) / (Math.max(dataPoints.length - 1, 1));
+            
+            let pointsPath = "";
+            let areaPath = `M ${padding} ${height - padding} `;
+
+            dataPoints.forEach((val, index) => {
+                const x = padding + index * xStep;
+                const y = padding + ((100 - val) / 100) * (height - padding * 2);
+                
+                if (index === 0) {
+                    pointsPath += `M ${x} ${y} `;
+                } else {
+                    pointsPath += `L ${x} ${y} `;
+                }
+
+                areaPath += `L ${x} ${y} `;
+            });
+
+            areaPath += `L ${padding + (dataPoints.length - 1) * xStep} ${height - padding} Z`;
+
+            let circles = "";
+            let gridLines = "";
+
+            for (let grid = 0; grid <= 4; grid++) {
+                const pct = grid * 25;
+                const y = padding + ((100 - pct) / 100) * (height - padding * 2);
+                gridLines += `
+                    <line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="#1e293b" stroke-width="1" stroke-dasharray="4,4" />
+                    <text x="${padding - 8}" y="${y + 4}" fill="#64748b" font-size="10" font-family="Plus Jakarta Sans" text-anchor="end">${pct}%</text>
+                `;
+            }
+
+            dataPoints.forEach((val, index) => {
+                const x = padding + index * xStep;
+                const y = padding + ((100 - val) / 100) * (height - padding * 2);
+                circles += `
+                    <circle cx="${x}" cy="${y}" r="4" fill="#6366f1" stroke="#ffffff" stroke-width="1.5" />
+                    <text x="${x}" y="${y - 10}" fill="#a5b4fc" font-size="9" font-family="Plus Jakarta Sans" text-anchor="middle" font-weight="bold">${val}%</text>
+                `;
+            });
+
+            const svgElement = `
+                <svg width="100%" height="100%" viewBox="0 0 ${width} ${height}" class="overflow-visible">
+                    <defs>
+                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.25"/>
+                            <stop offset="100%" stop-color="#4f46e5" stop-opacity="0.0"/>
+                        </linearGradient>
+                    </defs>
+                    ${gridLines}
+                    <path d="${areaPath}" fill="url(#chartGrad)" />
+                    <path d="${pointsPath}" fill="none" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                    ${circles}
+                </svg>
+            `;
+
+            wrapper.innerHTML = svgElement;
+        }
+
+        function downloadRawMarkdown() {
+            const mdContent = localStorage.getItem('calculation_score_md') || defaultMarkdown;
+            const blob = new Blob([mdContent], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "calculation_score.md";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast("📥", "calculation_score.md file downloaded successfully!");
+        }
+
+        function clearScoreHistory() {
+            if (confirm("Are you sure you want to clear your calculation scores database? This will reset the score file to blank template.")) {
+                localStorage.setItem('calculation_score_md', defaultMarkdown);
+                loadScoresHistory();
+                showToast("🗑️", "Scores database cleared!");
+            }
+        }
+    </script>
+</body>
+</html>

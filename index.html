@@ -150,11 +150,10 @@
                 </div>
                 
                <button id="menu-toggle-btn" onclick="toggleSideMenu(true)" class="p-2.5 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-300 hover:text-white rounded-xl transition flex items-center">
-    <!-- आइकन के लिए एक कंटेनर -->
-    <svg id="menu-icon" class="w-6 h-6 text-indigo-400 transition-colors" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-    </svg>
-</button>
+                    <svg id="menu-icon" class="w-6 h-6 text-indigo-400 transition-colors" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
             </div>
         </header>
 
@@ -639,7 +638,6 @@
 
     <!-- Active State Logic Implementation Code -->
     <script>
-        // LIVE Web App URL for Google Sheets Database Communication
         const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxFgOPPoeqYyrIZb4bavOmOVhP_RLontyE43Cs8pSbgCLpBCuqD9tvJJCc-R2PHsnywXA/exec";
 
         let categoryDifficulty = JSON.parse(localStorage.getItem('categoryDifficulty')) || {
@@ -694,7 +692,8 @@
             timeSpentSec: 0,
             secondsUsed: 0,
             activeListening: false,
-            recognitionEngine: null
+            recognitionEngine: null,
+            isProcessingAnswer: false // ✅ डबल या ऑटो सबमिशन रोकने के लिए डिबाउंसिंग लॉक
         };
 
         const defaultMarkdown = `# Calculation Scores History\n\n| Date & Time | Total Questions | Score | Accuracy | Breakdown |\n|---|---|---|---|---|\n`;
@@ -736,7 +735,6 @@
             }
         };
 
-        // Standardized Web API call function to avoid CORS/preflight blockings 
         function callCloudAPI(payload) {
             return fetch(GOOGLE_SHEET_API_URL, {
                 method: "POST",
@@ -784,7 +782,6 @@
                 if (resData.status === "success") {
                     localStorage.setItem('auth_class', sClass);
                     localStorage.setItem('auth_age', age);
-                    
                     showToast("🎉", "Registration complete! Logging in...");
                     executeAutoLogin(uId, pass);
                 } else {
@@ -904,39 +901,33 @@
         }
 
         function toggleSideMenu(open) {
-    const overlay = document.getElementById('side-menu-overlay');
-    const panel = document.getElementById('side-menu-panel');
-    const menuButton = document.getElementById('menu-toggle-btn');
-    const menuIcon = document.getElementById('menu-icon');
+            const overlay = document.getElementById('side-menu-overlay');
+            const panel = document.getElementById('side-menu-panel');
+            const menuButton = document.getElementById('menu-toggle-btn');
+            const menuIcon = document.getElementById('menu-icon');
 
-    if (open) {
-        // मेनू खोलें
-        overlay.classList.remove('pointer-events-none', 'opacity-0');
-        overlay.classList.add('opacity-100');
-        panel.classList.remove('translate-x-full');
-        panel.classList.add('translate-x-0');
+            if (open) {
+                overlay.classList.remove('pointer-events-none', 'opacity-0');
+                overlay.classList.add('opacity-100');
+                panel.classList.remove('translate-x-full');
+                panel.classList.add('translate-x-0');
 
-        // आइकन को 'CLOSE' (X) में बदलें और लाल रंग दें
-        menuIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>`;
-        menuIcon.classList.remove('text-indigo-400');
-        menuIcon.classList.add('text-rose-500'); 
-        menuButton.setAttribute('onclick', 'toggleSideMenu(false)');
-    } else {
-        // मेनू बंद करें
-        overlay.classList.add('pointer-events-none', 'opacity-0');
-        overlay.classList.remove('opacity-100');
-        panel.classList.remove('translate-x-0');
-        panel.classList.add('translate-x-full');
+                menuIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>`;
+                menuIcon.classList.remove('text-indigo-400');
+                menuIcon.classList.add('text-rose-500'); 
+                menuButton.setAttribute('onclick', 'toggleSideMenu(false)');
+            } else {
+                overlay.classList.add('pointer-events-none', 'opacity-0');
+                overlay.classList.remove('opacity-100');
+                panel.classList.remove('translate-x-0');
+                panel.classList.add('translate-x-full');
 
-        // आइकन को वापस 'MENU' (तीन लाइन) में बदलें
-        menuIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>`;
-        menuIcon.classList.remove('text-rose-500');
-        menuIcon.classList.add('text-indigo-400');
-        menuButton.setAttribute('onclick', 'toggleSideMenu(true)');
-    }
-}
-
-
+                menuIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>`;
+                menuIcon.classList.remove('text-rose-500');
+                menuIcon.classList.add('text-indigo-400');
+                menuButton.setAttribute('onclick', 'toggleSideMenu(true)');
+            }
+        }
 
         function menuNavigate(viewId) {
             toggleSideMenu(false);
@@ -1195,29 +1186,30 @@
             return (a * b) / getGCD(a, b);
         }
 
+        // Real-Time Elo Calculator Engine
         function calculateNewRating(currentRating, isCorrect, questionLevel, isTimerActive, secondsUsed, maxDuration, streak, lastWrong) {
             let questionRating = 100 + (questionLevel * 30);
-            let K = 1.0; 
+            let K = 2.0; // Dynamic scale coefficient
             
             if (isTimerActive && maxDuration > 0) {
                 if (isCorrect) {
-                    let speedBonus = 1 + ((maxDuration - secondsUsed) / maxDuration) * 0.2;
+                    let speedBonus = 1 + ((maxDuration - secondsUsed) / maxDuration) * 0.3;
                     K = K * speedBonus;
                 } else {
-                    let speedPenalty = 1 + ((maxDuration - secondsUsed) / maxDuration) * 0.15;
+                    let speedPenalty = 1 + ((maxDuration - secondsUsed) / maxDuration) * 0.2;
                     K = K * speedPenalty;
                 }
             }
             
-            if (isCorrect && streak >= 3) K = K + 0.2; 
+            if (isCorrect && streak >= 3) K = K + 0.3; 
             if (isCorrect && lastWrong) K = K + 0.2;
             
-            let expectedScore = 1 / (1 + Math.pow(10, (questionRating - currentRating) / 40));
+            let expectedScore = 1 / (1 + Math.pow(10, (questionRating - currentRating) / 400));
             let actualScore = isCorrect ? 1 : 0;
             
             let change = K * (actualScore - expectedScore);
-            if (change > 2.5) change = 2.5;
-            if (change < -2.5) change = -2.5;
+            if (change > 5.0) change = 5.0;
+            if (change < -5.0) change = -5.0;
             
             let newRating = currentRating + change;
             return parseFloat(newRating.toFixed(1));
@@ -1483,6 +1475,7 @@
             activeTestState.currentIndex = 0;
             activeTestState.correctCount = 0;
             activeTestState.scoresBreakdown = {};
+            activeTestState.isProcessingAnswer = false;
 
             categories.forEach(cat => {
                 const count = selectedCounts[cat.name] || 0;
@@ -1509,12 +1502,14 @@
 
         function loadCurrentQuestion() {
             clearInterval(activeTestState.currentQuestionTimer);
+            stopSpeechRecognition(); // ✅ पिछला वॉइस इंजन पूरी तरह बंद करें ताकि पुराना बफर साफ़ हो
 
             if (activeTestState.currentIndex >= activeTestState.questions.length) {
                 finishTestRun();
                 return;
             }
 
+            activeTestState.isProcessingAnswer = false; // ✅ नया सवाल आने पर लॉक खोलें
             document.getElementById('validation-overlay').classList.add('hidden');
             document.getElementById('manual-answer-input').value = "";
             document.getElementById('test-spoken-transcript').innerText = "अपनी आवाज़ में साफ जवाब बोलें...";
@@ -1549,7 +1544,12 @@
                 activeTestState.secondsUsed = 0; 
             }
 
-            startSpeechRecognition();
+            // ✅ थोड़ी देर बाद वॉइस इंजिन रिस्टार्ट करें ताकि पुराना बफर स्किप न हो
+            setTimeout(() => {
+                if(!activeTestState.isProcessingAnswer) {
+                    startSpeechRecognition();
+                }
+            }, 300);
         }
 
         function playFeedbackBeep(success) {
@@ -1581,7 +1581,11 @@
         }
 
         function handleAnswerValidation(isCorrect, debugMsg) {
+            if (activeTestState.isProcessingAnswer) return; // ✅ अगर एक बार सबमिट हो रहा है तो दोबारा कॉल न हो
+            activeTestState.isProcessingAnswer = true;
+
             clearInterval(activeTestState.currentQuestionTimer);
+            stopSpeechRecognition(); // ✅ वॉइस सुनना तुरंत बंद करें
             
             const curQ = activeTestState.questions[activeTestState.currentIndex];
             const currentCategory = curQ.category; 
@@ -1597,6 +1601,7 @@
                 currentStreak = 0; 
             }
 
+            // Real-time Elo update
             studentRating = calculateNewRating(
                 studentRating, 
                 isCorrect, 
@@ -1665,6 +1670,7 @@
         }
 
         function submitManualAnswer() {
+            if (activeTestState.isProcessingAnswer) return;
             const val = document.getElementById('manual-answer-input').value.trim();
             if (val === "") return;
 
@@ -1846,8 +1852,8 @@
             }
 
             const rec = new SpeechRecognition();
-            rec.continuous = true;
-            rec.interimResults = true;
+            rec.continuous = false; // ✅ 연속 इनपुट से रिस्पॉन्स ओवरलैप रोकने के लिए false रखें
+            rec.interimResults = false; // ✅ केवल फाइनल स्पीच रिजल्ट ही लें
             rec.lang = 'hi-IN'; 
 
             rec.onstart = function() {
@@ -1857,6 +1863,8 @@
             };
 
             rec.onresult = function(event) {
+                if(activeTestState.isProcessingAnswer) return; // ✅ अगर प्रोसेस चल रहा है तो नजरअंदाज करें
+
                 let finalTranscript = '';
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
@@ -1889,9 +1897,9 @@
             rec.onend = function() {
                 activeTestState.activeListening = false;
                 const testView = document.getElementById('view-test');
-                const isOverlayHidden = document.getElementById('validation-overlay').classList.contains('hidden');
                 
-                if (testView && !testView.classList.contains('hidden') && isOverlayHidden) {
+                // ✅ केवल तभी ऑटो-स्टार्ट करें जब सवाल सबमिट न हो रहा हो और टेस्ट व्यू चालू हो
+                if (testView && !testView.classList.contains('hidden') && !activeTestState.isProcessingAnswer) {
                     try {
                         rec.start();
                         activeTestState.activeListening = true;
@@ -1904,7 +1912,7 @@
         }
 
         function startSpeechRecognition() {
-            if (activeTestState.recognitionEngine && !activeTestState.activeListening) {
+            if (activeTestState.recognitionEngine && !activeTestState.activeListening && !activeTestState.isProcessingAnswer) {
                 try {
                     activeTestState.recognitionEngine.start();
                 } catch(e) {
@@ -1914,8 +1922,11 @@
         }
 
         function stopSpeechRecognition() {
-            if (activeTestState.recognitionEngine && activeTestState.activeListening) {
-                activeTestState.recognitionEngine.stop();
+            if (activeTestState.recognitionEngine) {
+                try {
+                    activeTestState.recognitionEngine.stop();
+                } catch(e) {}
+                activeTestState.activeListening = false;
             }
         }
 
@@ -2078,7 +2089,8 @@
             `;
             wrapper.innerHTML = svgElement;
         }
-       function downloadRawMarkdown() {
+
+        function downloadRawMarkdown() {
             const mdContent = localStorage.getItem('calculation_score_md') || defaultMarkdown;
             const blob = new Blob([mdContent], { type: 'text/markdown' });
             const url = URL.createObjectURL(blob);

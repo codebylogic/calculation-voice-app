@@ -638,37 +638,20 @@
 
     <!-- Active State Logic Implementation Code -->
     <script>
-        // मूल एरे
-const originalArray = [10, 20, 30, 40, 50, 60, 70, 80, 90, 120, 15, 25, 35, 45, 75, 12.5, 37.5, 62.5, 87.5, 16.6, 33.3, 66.6, 83.3, 14.2, 28.5, 6.25, 18.75, 31.25, 43.75, 56.25, 68.75, 81.25, 93.75, 11.11, 22.22];[span_3](start_span)[span_3](end_span)
-
-// रेटिंग के आधार पर मान फ़िल्टर करने का फ़ंक्शन
-function getPercentagesByRating(array, rating) {
-    if (rating < 150) {
-        // बिना दशमलव वाले (Integer)
-        return array.filter(num => Number.isInteger(num));
-    } else if (rating >= 150 && rating <= 180) {
-        // दशमलव के बाद केवल 1 अंक वाले (1 Decimal Place)
-        return array.filter(num => {
-            const str = num.toString();
-            return str.includes('.') && str.split('.')[1].length === 1;
-        });
-    } else if (rating > 180) {
-        // दशमलव के बाद 1 या 2 अंक वाले (1 or 2 Decimal Places)
-        return array.filter(num => {
-            const str = num.toString();
-            if (!str.includes('.')) return false;
-            const decimalLength = str.split('.')[1].length;
-            return decimalLength === 1 || decimalLength === 2;
-        });
-    }
-}
-
-// उदाहरण (Usage):
-console.log("Rating < 150:", getPercentagesByRating(originalArray, 120));
-console.log("Rating 150-180:", getPercentagesByRating(originalArray, 160));
-console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
-
         const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxFgOPPoeqYyrIZb4bavOmOVhP_RLontyE43Cs8pSbgCLpBCuqD9tvJJCc-R2PHsnywXA/exec";
+
+        // Elo Rating Status Helper
+        function getPlayerStatus(rating) {
+            if (rating >= 1000) return "Grandmaster";
+            if (rating >= 650)  return "Master";
+            if (rating >= 500)  return "Elite Heroic";
+            if (rating >= 400)  return "Heroic";
+            if (rating >= 325)  return "Platinum";
+            if (rating >= 275)  return "Dimand";
+            if (rating >= 225)  return "Gold";
+            if (rating >= 140)  return "Silver";
+            return "Learner";
+        }
 
         let categoryDifficulty = JSON.parse(localStorage.getItem('categoryDifficulty')) || {
             "Addition (1 Digit)": 2, "Addition": 2, "Addition (2 Digit)": 2, "Addition (3 Digit)": 2,
@@ -722,7 +705,7 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
             secondsUsed: 0,
             activeListening: false,
             recognitionEngine: null,
-            isProcessingAnswer: false // ✅ डबल या ऑटो सबमिशन रोकने के लिए डिबाउंसिंग लॉक
+            isProcessingAnswer: false
         };
 
         const defaultMarkdown = `# Calculation Scores History\n\n| Date & Time | Total Questions | Score | Accuracy | Breakdown |\n|---|---|---|---|---|\n`;
@@ -923,8 +906,7 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
                 document.getElementById('profile-display-class').innerText = localStorage.getItem('auth_class') || "Not Set";
                 document.getElementById('profile-display-age').innerText = localStorage.getItem('auth_age') || "Not Set";
                 
-                let pStatus = studentRating >= 160 ? "Grandmaster" : studentRating >= 140 ? "Master" : studentRating >= 120 ? "Expert" : "Learner";
-                document.getElementById('profile-card-status').innerText = pStatus;
+                document.getElementById('profile-card-status').innerText = getPlayerStatus(studentRating);
                 loadSavedProfileImage();
             }
         }
@@ -1218,7 +1200,7 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
         // Real-Time Elo Calculator Engine
         function calculateNewRating(currentRating, isCorrect, questionLevel, isTimerActive, secondsUsed, maxDuration, streak, lastWrong) {
             let questionRating = 100 + (questionLevel * 30);
-            let K = 2.0; // Dynamic scale coefficient
+            let K = 2.0;
             
             if (isTimerActive && maxDuration > 0) {
                 if (isCorrect) {
@@ -1531,14 +1513,14 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
 
         function loadCurrentQuestion() {
             clearInterval(activeTestState.currentQuestionTimer);
-            stopSpeechRecognition(); // ✅ पिछला वॉइस इंजन पूरी तरह बंद करें ताकि पुराना बफर साफ़ हो
+            stopSpeechRecognition();
 
             if (activeTestState.currentIndex >= activeTestState.questions.length) {
                 finishTestRun();
                 return;
             }
 
-            activeTestState.isProcessingAnswer = false; // ✅ नया सवाल आने पर लॉक खोलें
+            activeTestState.isProcessingAnswer = false;
             document.getElementById('validation-overlay').classList.add('hidden');
             document.getElementById('manual-answer-input').value = "";
             document.getElementById('test-spoken-transcript').innerText = "अपनी आवाज़ में साफ जवाब बोलें...";
@@ -1573,7 +1555,6 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
                 activeTestState.secondsUsed = 0; 
             }
 
-            // ✅ थोड़ी देर बाद वॉइस इंजिन रिस्टार्ट करें ताकि पुराना बफर स्किप न हो
             setTimeout(() => {
                 if(!activeTestState.isProcessingAnswer) {
                     startSpeechRecognition();
@@ -1610,11 +1591,11 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
         }
 
         function handleAnswerValidation(isCorrect, debugMsg) {
-            if (activeTestState.isProcessingAnswer) return; // ✅ अगर एक बार सबमिट हो रहा है तो दोबारा कॉल न हो
+            if (activeTestState.isProcessingAnswer) return;
             activeTestState.isProcessingAnswer = true;
 
             clearInterval(activeTestState.currentQuestionTimer);
-            stopSpeechRecognition(); // ✅ वॉइस सुनना तुरंत बंद करें
+            stopSpeechRecognition();
             
             const curQ = activeTestState.questions[activeTestState.currentIndex];
             const currentCategory = curQ.category; 
@@ -1630,7 +1611,6 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
                 currentStreak = 0; 
             }
 
-            // Real-time Elo update
             studentRating = calculateNewRating(
                 studentRating, 
                 isCorrect, 
@@ -1881,8 +1861,8 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
             }
 
             const rec = new SpeechRecognition();
-            rec.continuous = false; // ✅ 연속 इनपुट से रिस्पॉन्स ओवरलैप रोकने के लिए false रखें
-            rec.interimResults = false; // ✅ केवल फाइनल स्पीच रिजल्ट ही लें
+            rec.continuous = false;
+            rec.interimResults = false;
             rec.lang = 'hi-IN'; 
 
             rec.onstart = function() {
@@ -1892,7 +1872,7 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
             };
 
             rec.onresult = function(event) {
-                if(activeTestState.isProcessingAnswer) return; // ✅ अगर प्रोसेस चल रहा है तो नजरअंदाज करें
+                if(activeTestState.isProcessingAnswer) return;
 
                 let finalTranscript = '';
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
@@ -1927,7 +1907,6 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
                 activeTestState.activeListening = false;
                 const testView = document.getElementById('view-test');
                 
-                // ✅ केवल तभी ऑटो-स्टार्ट करें जब सवाल सबमिट न हो रहा हो और टेस्ट व्यू चालू हो
                 if (testView && !testView.classList.contains('hidden') && !activeTestState.isProcessingAnswer) {
                     try {
                         rec.start();
@@ -1984,8 +1963,7 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
             showToast("💾", "Score successfully appended to calculation_score.md!");
             navigateTo('scores');
         }
-
-        function loadScoresHistory() {
+      function loadScoresHistory() {
             const fileContent = localStorage.getItem('calculation_score_md') || defaultMarkdown;
             const parsedRecords = parseMarkdownTable(fileContent);
 
@@ -2170,9 +2148,7 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
                     const isSelf = player.id === playerId;
                     const rowClass = isSelf ? "bg-indigo-500/10 font-bold border-l-2 border-indigo-500" : "hover:bg-slate-900/30 transition";
                     
-                    let playerStatus = player.rating >= 160 ? "Grandmaster" : 
-                                       player.rating >= 140 ? "Master" : 
-                                       player.rating >= 120 ? "Expert" : "Learner";
+                    let playerStatus = getPlayerStatus(player.rating);
 
                     const tr = document.createElement('tr');
                     tr.className = `${rowClass} border-b border-slate-800/40`;
@@ -2184,7 +2160,10 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
                             <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
                                 playerStatus === 'Grandmaster' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
                                 playerStatus === 'Master' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' :
-                                playerStatus === 'Expert' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' :
+                                playerStatus === 'Elite Heroic' || playerStatus === 'Heroic' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
+                                playerStatus === 'Platinum' || playerStatus === 'Dimand' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' :
+                                playerStatus === 'Gold' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' :
+                                playerStatus === 'Silver' ? 'bg-slate-500/10 text-slate-300 border border-slate-500/20' :
                                 'bg-slate-800 text-slate-400'
                             }">${playerStatus}</span>
                         </td>
@@ -2194,31 +2173,28 @@ console.log("Rating 180+:", getPercentagesByRating(originalArray, 200));
 
                 if(chartContainer) {
                     chartContainer.innerHTML = '';
-                    let maxEloInList = Math.max(...globalPlayers.map(p => p.rating), 200);
+                    let maxEloInList = Math.max(...globalPlayers.map(p => p.rating), 1000);
 
                     globalPlayers.forEach(player => {
                         const isSelf = player.id === playerId;
-                        let playerStatus = player.rating >= 1000 ? "Grandmaster" : 
-                   player.rating >= 650  ? "Master" : 
-                   player.rating >= 500  ? "Elite heroic" : 
-                   player.rating >= 400  ? "Heroic" : 
-                   player.rating >= 325  ? "Platinum" : 
-                   player.rating >= 275  ? "Dimand" : 
-                   player.rating >= 140  ? "Silver" : "Learner";
+                        let playerStatus = getPlayerStatus(player.rating);
 
                         let barWidth = Math.min(100, Math.max(8, (player.rating / maxEloInList) * 100));
 
                         let barColor = "from-slate-600 to-slate-500";
                         if (playerStatus === 'Grandmaster') barColor = "from-amber-500 to-orange-500";
                         else if (playerStatus === 'Master') barColor = "from-rose-500 to-red-500";
-                        else if (playerStatus === 'Expert') barColor = "from-brand-500 to-indigo-600";
+                        else if (playerStatus === 'Elite Heroic' || playerStatus === 'Heroic') barColor = "from-purple-500 to-pink-500";
+                        else if (playerStatus === 'Platinum' || playerStatus === 'Dimand') barColor = "from-cyan-500 to-blue-500";
+                        else if (playerStatus === 'Gold') barColor = "from-yellow-500 to-amber-500";
+                        else if (playerStatus === 'Silver') barColor = "from-slate-400 to-slate-500";
 
                         const barRow = document.createElement('div');
                         barRow.className = "space-y-1";
                         barRow.innerHTML = `
                             <div class="flex justify-between text-[11px] font-medium px-1">
                                 <span class="${isSelf ? 'text-indigo-400 font-bold' : 'text-slate-300'}">${player.name} ${isSelf ? '(You)' : ''}</span>
-                                <span class="text-slate-400 font-mono font-bold">${player.rating} Elo</span>
+                                <span class="text-slate-400 font-mono font-bold">${player.rating} Elo (${playerStatus})</span>
                             </div>
                             <div class="w-full bg-slate-900 h-4 rounded-lg overflow-hidden border border-slate-800/60 flex items-center">
                                 <div class="bg-gradient-to-r ${barColor} h-full rounded-lg bar-fill flex items-center justify-end px-2" style="width: ${barWidth}%">

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calcu-voice-v1';
+const CACHE_NAME = 'calcu-voice-v2';
 const ASSETS = [
   './',
   './index.html',

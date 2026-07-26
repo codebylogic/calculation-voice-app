@@ -5,6 +5,10 @@
     ".html": {
       "enabled": true,
       "run": "vscode-html-language-server --stdio"
+    },
+    ".js": {
+      "enabled": false,
+      "run": "typescript-language-server --stdio"
     }
   }
 }

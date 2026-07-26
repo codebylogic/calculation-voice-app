@@ -558,12 +558,12 @@
                     </table>
                 </div>
                 
-                <!-- 📊 Elo Performance Chart -->
+                <!-- 📊 Daily Practice Bar Chart -->
                 <div class="mt-8 bg-slate-900/40 border border-slate-800 rounded-2xl p-6 space-y-4">
                     <h3 class="text-sm font-extrabold text-slate-200 flex items-center space-x-2">
-                        <span>📊 छात्रों का तुलनात्मक दंड आलेख (Elo Performance Chart)</span>
+                        <span>📊 आज का अभ्यास दंड आलेख (Today's Solved Questions Chart)</span>
                     </h3>
-                    <p class="text-xs text-slate-400">सभी छात्रों की Elo रेटिंग का लाइव ग्राफ़िकल आलेख।</p>
+                    <p class="text-xs text-slate-400">सभी छात्रों द्वारा आज हल किए गए कुल प्रश्नों की संख्या (हर रात 12:00 बजे रीसेट होती है)।</p>
                     
                     <!-- Chart container -->
                     <div class="w-full bg-slate-950/50 border border-slate-800/50 rounded-xl p-4 flex flex-col space-y-3" id="lb-bar-chart-container">
@@ -653,6 +653,22 @@
             return "Learner";
         }
 
+        // Tier key used purely for QUESTION GENERATION difficulty rules (Elo Rating based).
+        // Silver 140+, Gold 225+, Diamond 275+, Heroic/Grandmaster 400+ (see generateArithmeticExpression).
+        function getEloQuestionTier(rating) {
+            if (rating >= 400) return "heroic";   // Heroic / Grandmaster (400+ to 1000+)
+            if (rating >= 275) return "diamond";
+            if (rating >= 225) return "gold";
+            if (rating >= 140) return "silver";
+            return "learner";
+        }
+
+        // ---- Random helpers ----
+        function randInt(min, max) { // inclusive
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        function unitDigit(n) { return Math.abs(n) % 10; }
+
         let categoryDifficulty = JSON.parse(localStorage.getItem('categoryDifficulty')) || {
             "Addition (1 Digit)": 2, "Addition": 2, "Addition (2 Digit)": 2, "Addition (3 Digit)": 2,
             "Subtraction (1 Digit)": 2, "Subtraction": 2, "Subtraction (2 Digit)": 2, "Subtraction (3 Digit)": 2,
@@ -669,6 +685,48 @@
         
         let studentName = localStorage.getItem('auth_name') || "";
         let playerId = localStorage.getItem('auth_userid') || "";
+
+        // ---- Daily Practice Solved Count (resets automatically every midnight 00:00) ----
+        function getTodayDateString() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function initTodayCount() {
+            const savedDate = localStorage.getItem('lastDate');
+            const todayStr = getTodayDateString();
+            let savedCount = parseInt(localStorage.getItem('todayCount'), 10);
+            if (savedDate !== todayStr || isNaN(savedCount)) {
+                savedCount = 0;
+                localStorage.setItem('lastDate', todayStr);
+                localStorage.setItem('todayCount', "0");
+            }
+            return savedCount;
+        }
+
+        let todaySolvedCount = initTodayCount();
+
+        // Watches the clock so the count silently resets to 0 right after midnight
+        // even if the app is left open across the day boundary.
+        setInterval(() => {
+            const todayStr = getTodayDateString();
+            if (localStorage.getItem('lastDate') !== todayStr) {
+                todaySolvedCount = 0;
+                localStorage.setItem('lastDate', todayStr);
+                localStorage.setItem('todayCount', "0");
+            }
+        }, 30000);
+
+        function incrementTodaySolvedCount() {
+            const todayStr = getTodayDateString();
+            if (localStorage.getItem('lastDate') !== todayStr) {
+                todaySolvedCount = 0;
+                localStorage.setItem('lastDate', todayStr);
+            }
+            todaySolvedCount++;
+            localStorage.setItem('todayCount', String(todaySolvedCount));
+            localStorage.setItem('lastDate', todayStr);
+        }
 
         const categories = [
             { id: "dd_add", name: "Addition (2 Digit)", desc: "Double digit + double digit addition", defaultCount: 5 },
@@ -833,6 +891,16 @@
                     playerId = uId;
                     studentName = resData.name;
                     studentRating = resData.rating;
+
+                    // Restore today's solved count from cloud if it matches today's date
+                    const todayStr = getTodayDateString();
+                    if (resData.lastDate === todayStr && !isNaN(parseInt(resData.todayCount, 10))) {
+                        todaySolvedCount = parseInt(resData.todayCount, 10);
+                    } else {
+                        todaySolvedCount = 0;
+                    }
+                    localStorage.setItem('todayCount', String(todaySolvedCount));
+                    localStorage.setItem('lastDate', todayStr);
 
                     document.getElementById('view-auth').classList.add('hidden');
                     document.getElementById('main-app-content').classList.remove('hidden');
@@ -1001,7 +1069,9 @@
                     action: "update",
                     id: playerId,       
                     name: studentName,   
-                    rating: studentRating
+                    rating: studentRating,
+                    todayCount: todaySolvedCount,
+                    lastDate: getTodayDateString()
                 })
             }).catch(err => console.log("Cloud update error:", err));
             localStorage.setItem('auth_rating', studentRating);
@@ -1197,8 +1267,21 @@
             return (a * b) / getGCD(a, b);
         }
 
+        // List of "easy" categories used by the Rating Squeeze Rule below.
+        const EASY_SQUEEZE_CATEGORIES = [
+            "Addition (1 Digit)", "Addition", "Addition (2 Digit)",
+            "Subtraction (1 Digit)", "Subtraction", "Subtraction (2 Digit)"
+        ];
+
+        // Rating Squeeze Rule: once a student's Elo rating crosses 500, solving a very
+        // easy question (like plain 2-digit addition) should barely move the needle —
+        // otherwise students could farm rating by spamming trivial questions.
+        function isSqueezeEligible(currentRating, categoryName) {
+            return currentRating > 500 && EASY_SQUEEZE_CATEGORIES.includes(categoryName);
+        }
+
         // Real-Time Elo Calculator Engine
-        function calculateNewRating(currentRating, isCorrect, questionLevel, isTimerActive, secondsUsed, maxDuration, streak, lastWrong) {
+        function calculateNewRating(currentRating, isCorrect, questionLevel, isTimerActive, secondsUsed, maxDuration, streak, lastWrong, squeezeApplies) {
             let questionRating = 100 + (questionLevel * 30);
             let K = 2.0;
             
@@ -1221,9 +1304,174 @@
             let change = K * (actualScore - expectedScore);
             if (change > 5.0) change = 5.0;
             if (change < -5.0) change = -5.0;
+
+            // --- Rating Squeeze Rule (Section 2) ---
+            // Rating > 500 + easy question + correct answer => cap the gain at +0.1
+            if (squeezeApplies && isCorrect && change > 0.1) {
+                change = 0.1;
+            }
             
             let newRating = currentRating + change;
             return parseFloat(newRating.toFixed(1));
+        }
+
+        // =====================================================================
+        // TIER-BASED QUESTION GENERATORS (Elo Rating driven — Section 1)
+        // Silver 140+ | Gold 225+ | Diamond 275+ | Heroic/Grandmaster 400+
+        // =====================================================================
+
+        function generateTieredAddition(tier) {
+            let num1, num2;
+            if (tier === "diamond") {
+                // >60 + >60, always with a carry on the units digit
+                do {
+                    num1 = randInt(61, 99);
+                    num2 = randInt(61, 99);
+                } while ((unitDigit(num1) + unitDigit(num2)) < 10);
+            } else if (tier === "gold") {
+                // >50 + >50, units digit of either number is never 0
+                do {
+                    num1 = randInt(51, 99);
+                    num2 = randInt(51, 99);
+                } while (unitDigit(num1) === 0 || unitDigit(num2) === 0);
+            } else { // silver
+                // >50 + >50
+                num1 = randInt(51, 99);
+                num2 = randInt(51, 99);
+            }
+            return { questionText: `${num1} + ${num2}`, correctAnswer: num1 + num2 };
+        }
+
+        function generateTieredHCF(tier) {
+            let min, forbiddenMax;
+            if (tier === "diamond") { min = 71; forbiddenMax = 20; }      // >70, answer not in [1,20]
+            else if (tier === "gold") { min = 51; forbiddenMax = 10; }    // >50, answer not in [1,10]
+            else { min = 51; forbiddenMax = 1; }                          // silver: >50, answer never 1
+
+            let a, b, gcd;
+            let attempts = 0;
+            do {
+                a = randInt(min, min + 80);
+                b = randInt(min, min + 80);
+                gcd = getGCD(a, b);
+                attempts++;
+            } while (gcd >= 1 && gcd <= forbiddenMax && attempts < 200);
+
+            return { questionText: `HCF of (${a}, ${b})`, correctAnswer: gcd };
+        }
+
+        function generateTieredSquare(tier) {
+            let base;
+            if (tier === "heroic") {
+                // Triple-digit squares (100-125) whose units digit is always '5' (105², 115², 125²)
+                base = 100 + (randInt(0, 2) * 10) + 5; // 105, 115, 125
+            } else if (tier === "diamond") {
+                // 30-80, units digit must not be 0 or 5
+                do {
+                    base = randInt(30, 80);
+                } while (unitDigit(base) === 0 || unitDigit(base) === 5);
+            } else if (tier === "gold") {
+                // 30-80, units digit must not be 0
+                do {
+                    base = randInt(30, 80);
+                } while (unitDigit(base) === 0);
+            } else {
+                // silver: 30-60
+                base = randInt(30, 60);
+            }
+            return { questionText: `${base}²`, correctAnswer: base * base };
+        }
+
+        function generateTieredCubeRoot(tier) {
+            let min, max;
+            if (tier === "diamond" || tier === "heroic") { min = 20; max = 50; }
+            else { min = 1; max = 30; } // silver / gold
+            const base = randInt(min, max);
+            return { questionText: `∛${base * base * base}`, correctAnswer: base };
+        }
+
+        function generateTieredPercentage(tier) {
+            let pct, finalNum;
+            if (tier === "gold" || tier === "diamond" || tier === "heroic") {
+                // "_2.5%" / Inspector Chalisa pattern: 2.5, 12.5, 22.5 ... 92.5%
+                pct = randInt(0, 9) * 10 + 2.5;
+                finalNum = randInt(2, 40) * 20;
+            } else {
+                // silver: Number × _0% (percentage always ends in 0, e.g. 10%, 20%...90%)
+                pct = randInt(1, 9) * 10;
+                finalNum = randInt(2, 40) * 10;
+            }
+            const correctAnswer = parseFloat(((pct / 100) * finalNum).toFixed(2));
+            return { questionText: `${pct}% of ${finalNum}`, correctAnswer };
+        }
+
+        function getDivisors(n) {
+            n = Math.abs(Math.round(n));
+            const divs = [];
+            for (let d = 2; d <= n; d++) {
+                if (n % d === 0) divs.push(d);
+            }
+            return divs;
+        }
+
+        // Safely builds and evaluates a BODMAS-style expression using only
+        // +, -, ×, ÷. A running "multiplicative chain value" is tracked (reset on
+        // +/-) so any ÷ term is always an exact divisor of it, guaranteeing a
+        // clean whole-number result for that step (matching standard operator
+        // precedence, i.e. BODMAS/PEMDAS for +,-,×,÷ with no brackets).
+        function generateTieredBODMAS(tier) {
+            let termCount, digitMin, digitMax;
+            if (tier === "gold" || tier === "diamond" || tier === "heroic") {
+                termCount = 4; digitMin = 10; digitMax = 999; // 2-3 digit terms
+            } else if (tier === "silver") {
+                termCount = 3; digitMin = 10; digitMax = 99; // 2-digit terms
+            } else {
+                termCount = 3; digitMin = 1; digitMax = 9;
+            }
+
+            const ops = ['+', '-', '×', '÷'];
+            let expressionParts = [];
+
+            let firstTerm = randInt(digitMin, digitMax);
+            expressionParts.push(String(firstTerm));
+            let chainValue = firstTerm; // running value of the current ×÷ chain segment
+
+            for (let i = 1; i < termCount; i++) {
+                let op = ops[randInt(0, ops.length - 1)];
+                let nextTerm;
+
+                if (op === '÷') {
+                    const divisors = getDivisors(chainValue).filter(d => d <= 12);
+                    if (divisors.length === 0) {
+                        op = '+'; // fall back if chainValue has no small clean divisor
+                        nextTerm = randInt(digitMin, digitMax);
+                        chainValue = nextTerm;
+                    } else {
+                        nextTerm = divisors[randInt(0, divisors.length - 1)];
+                        chainValue = chainValue / nextTerm;
+                    }
+                } else if (op === '×') {
+                    nextTerm = randInt(2, 12); // small multiplier keeps mental-math practical
+                    chainValue = chainValue * nextTerm;
+                } else {
+                    nextTerm = randInt(digitMin, digitMax);
+                    chainValue = nextTerm; // chain resets after +/-
+                }
+
+                expressionParts.push(op, String(nextTerm));
+            }
+
+            const questionText = expressionParts.join(' ');
+            // Evaluate respecting standard operator precedence (matches BODMAS for +,-,×,÷)
+            const evalExpr = questionText.replace(/×/g, '*').replace(/÷/g, '/');
+            let correctAnswer;
+            try {
+                correctAnswer = Function(`"use strict"; return (${evalExpr});`)();
+                correctAnswer = parseFloat(correctAnswer.toFixed(2));
+            } catch (e) {
+                correctAnswer = 0;
+            }
+            return { questionText, correctAnswer };
         }
 
         function generateArithmeticExpression(categoryName) {
@@ -1242,13 +1490,20 @@
                 }
                 case "Addition":
                 case "Addition (2 Digit)": {
-                    let min1 = 10, max1 = 99, min2 = 10, max2 = 99;
-                    if (level === 1) { max1 = 40; max2 = 40; } 
-                    else if (level === 3) { min1 = 60; min2 = 60; } 
-                    const num1 = Math.floor(Math.random() * (max1 - min1 + 1)) + min1;
-                    const num2 = Math.floor(Math.random() * (max2 - min2 + 1)) + min2;
-                    questionText = `${num1} + ${num2}`;
-                    correctAnswer = num1 + num2;
+                    const tier = getEloQuestionTier(studentRating);
+                    if (tier !== "learner") {
+                        const result = generateTieredAddition(tier);
+                        questionText = result.questionText;
+                        correctAnswer = result.correctAnswer;
+                    } else {
+                        let min1 = 10, max1 = 99, min2 = 10, max2 = 99;
+                        if (level === 1) { max1 = 40; max2 = 40; } 
+                        else if (level === 3) { min1 = 60; min2 = 60; } 
+                        const num1 = Math.floor(Math.random() * (max1 - min1 + 1)) + min1;
+                        const num2 = Math.floor(Math.random() * (max2 - min2 + 1)) + min2;
+                        questionText = `${num1} + ${num2}`;
+                        correctAnswer = num1 + num2;
+                    }
                     break;
                 }
                 case "Addition (3 Digit)": {
@@ -1357,12 +1612,19 @@
                     break;
                 }
                 case "Square": {
-                    let min = 11, max = 30;
-                    if (level === 2) max = 60;
-                    if (level === 3) max = 99;
-                    const a = Math.floor(Math.random() * (max - min + 1)) + min; 
-                    questionText = `${a}²`;
-                    correctAnswer = a * a;
+                    const tier = getEloQuestionTier(studentRating);
+                    if (tier !== "learner") {
+                        const result = generateTieredSquare(tier);
+                        questionText = result.questionText;
+                        correctAnswer = result.correctAnswer;
+                    } else {
+                        let min = 11, max = 30;
+                        if (level === 2) max = 60;
+                        if (level === 3) max = 99;
+                        const a = Math.floor(Math.random() * (max - min + 1)) + min; 
+                        questionText = `${a}²`;
+                        correctAnswer = a * a;
+                    }
                     break;
                 }
                 case "Division":
@@ -1405,12 +1667,19 @@
                     break;
                 }
                 case "Cube Root (11-50)": {
-                    let min = 11, max = 50;
-                    if (level === 1) max = 25; 
-                    else if (level === 3) min = 35; 
-                    const base = Math.floor(Math.random() * (max - min + 1)) + min;
-                    questionText = `∛${base * base * base}`;
-                    correctAnswer = base;
+                    const tier = getEloQuestionTier(studentRating);
+                    if (tier !== "learner") {
+                        const result = generateTieredCubeRoot(tier);
+                        questionText = result.questionText;
+                        correctAnswer = result.correctAnswer;
+                    } else {
+                        let min = 11, max = 50;
+                        if (level === 1) max = 25; 
+                        else if (level === 3) min = 35; 
+                        const base = Math.floor(Math.random() * (max - min + 1)) + min;
+                        questionText = `∛${base * base * base}`;
+                        correctAnswer = base;
+                    }
                     break;
                 }
                 case "LCM": {
@@ -1422,11 +1691,18 @@
                     break;
                 }
                 case "HCF": {
-                    let max = (level === 1) ? 40 : (level === 2) ? 80 : 120;
-                    const a = Math.floor(Math.random() * (max - 12 + 1)) + 12; 
-                    const b = Math.floor(Math.random() * (max - 12 + 1)) + 12; 
-                    questionText = `HCF of (${a}, ${b})`;
-                    correctAnswer = getGCD(a, b);
+                    const tier = getEloQuestionTier(studentRating);
+                    if (tier !== "learner") {
+                        const result = generateTieredHCF(tier);
+                        questionText = result.questionText;
+                        correctAnswer = result.correctAnswer;
+                    } else {
+                        let max = (level === 1) ? 40 : (level === 2) ? 80 : 120;
+                        const a = Math.floor(Math.random() * (max - 12 + 1)) + 12; 
+                        const b = Math.floor(Math.random() * (max - 12 + 1)) + 12; 
+                        questionText = `HCF of (${a}, ${b})`;
+                        correctAnswer = getGCD(a, b);
+                    }
                     break;
                 }
                 case "Fractions": {
@@ -1447,12 +1723,19 @@
                     break;
                 }
                 case "Percentage": {
-                    let base = (level === 1) ? 100 : (level === 2) ? 50 : 25;
-                    let pct = (level === 1) ? 10 : (level === 2) ? 20 : 15;
-                    let num = Math.floor(Math.random() * 5) + 1;
-                    let finalNum = base * num; 
-                    questionText = `${pct}% of ${finalNum}`;
-                    correctAnswer = parseFloat(((pct / 100) * finalNum).toFixed(2));
+                    const tier = getEloQuestionTier(studentRating);
+                    if (tier !== "learner") {
+                        const result = generateTieredPercentage(tier);
+                        questionText = result.questionText;
+                        correctAnswer = result.correctAnswer;
+                    } else {
+                        let base = (level === 1) ? 100 : (level === 2) ? 50 : 25;
+                        let pct = (level === 1) ? 10 : (level === 2) ? 20 : 15;
+                        let num = Math.floor(Math.random() * 5) + 1;
+                        let finalNum = base * num; 
+                        questionText = `${pct}% of ${finalNum}`;
+                        correctAnswer = parseFloat(((pct / 100) * finalNum).toFixed(2));
+                    }
                     break;
                 }
                 case "Decimal Arithmetic":
@@ -1465,7 +1748,12 @@
                 }
                 case "BODMAS Rules": 
                 default: {
-                    if (level === 1) {
+                    const tier = getEloQuestionTier(studentRating);
+                    if (tier !== "learner") {
+                        const result = generateTieredBODMAS(tier);
+                        questionText = result.questionText;
+                        correctAnswer = result.correctAnswer;
+                    } else if (level === 1) {
                         questionText = "2 × 3 + 4";
                         correctAnswer = 10;
                     } else if (level === 2) {
@@ -1611,6 +1899,8 @@
                 currentStreak = 0; 
             }
 
+            const squeezeApplies = isSqueezeEligible(studentRating, currentCategory);
+
             studentRating = calculateNewRating(
                 studentRating, 
                 isCorrect, 
@@ -1619,9 +1909,14 @@
                 secondsUsed, 
                 maxDuration,
                 currentStreak,
-                wasLastWrong
+                wasLastWrong,
+                squeezeApplies
             );
             document.getElementById('home-rating-display').innerText = studentRating;
+
+            // Section 3: every solved question (correct or wrong) counts toward
+            // "today's solved questions" used by the leaderboard bar chart.
+            incrementTodaySolvedCount();
 
             uploadRatingToCloud();
 
@@ -2173,13 +2468,24 @@
 
                 if(chartContainer) {
                     chartContainer.innerHTML = '';
-                    let maxEloInList = Math.max(...globalPlayers.map(p => p.rating), 1000);
 
-                    globalPlayers.forEach(player => {
+                    // Section 3: bar chart now plots "today's solved questions count"
+                    // instead of Elo rating. Server may not have reset an old lastDate row
+                    // yet, so treat any row whose lastDate isn't today as 0 for display.
+                    const todayStr = getTodayDateString();
+                    const playersWithTodayCount = globalPlayers.map(p => {
+                        const isSelf = p.id === playerId;
+                        let count = isSelf ? todaySolvedCount : (p.lastDate === todayStr ? (parseInt(p.todayCount, 10) || 0) : 0);
+                        return Object.assign({}, p, { todayDisplayCount: count });
+                    });
+
+                    let maxCountInList = Math.max(...playersWithTodayCount.map(p => p.todayDisplayCount), 1);
+
+                    playersWithTodayCount.forEach(player => {
                         const isSelf = player.id === playerId;
                         let playerStatus = getPlayerStatus(player.rating);
 
-                        let barWidth = Math.min(100, Math.max(8, (player.rating / maxEloInList) * 100));
+                        let barWidth = Math.min(100, Math.max(player.todayDisplayCount > 0 ? 8 : 2, (player.todayDisplayCount / maxCountInList) * 100));
 
                         let barColor = "from-slate-600 to-slate-500";
                         if (playerStatus === 'Grandmaster') barColor = "from-amber-500 to-orange-500";
@@ -2194,11 +2500,11 @@
                         barRow.innerHTML = `
                             <div class="flex justify-between text-[11px] font-medium px-1">
                                 <span class="${isSelf ? 'text-indigo-400 font-bold' : 'text-slate-300'}">${player.name} ${isSelf ? '(You)' : ''}</span>
-                                <span class="text-slate-400 font-mono font-bold">${player.rating} Elo (${playerStatus})</span>
+                                <span class="text-slate-400 font-mono font-bold">${player.todayDisplayCount} Solved Today</span>
                             </div>
                             <div class="w-full bg-slate-900 h-4 rounded-lg overflow-hidden border border-slate-800/60 flex items-center">
                                 <div class="bg-gradient-to-r ${barColor} h-full rounded-lg bar-fill flex items-center justify-end px-2" style="width: ${barWidth}%">
-                                    <span class="text-[9px] text-white font-black font-mono tracking-tighter opacity-80">${Math.round(barWidth)}%</span>
+                                    <span class="text-[9px] text-white font-black font-mono tracking-tighter opacity-80">${player.todayDisplayCount}</span>
                                 </div>
                             </div>
                         `;

@@ -1,0 +1,40 @@
+/* General Body & Typography */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #090d16;
+}
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* Bar Fill Transition */
+.bar-fill {
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Podium Custom Glow Effects --- */
+/* 1st Rank: Heavy Gold Glow */
+.glow-gold {
+    box-shadow: 0 0 35px rgba(250, 204, 21, 0.9), 0 0 60px rgba(234, 179, 8, 0.5);
+}
+
+/* 2nd Rank: Moderate Silver Glow */
+.glow-silver {
+    box-shadow: 0 0 20px rgba(203, 213, 225, 0.5);
+}
+
+/* 3rd Rank: Soft Bronze Glow */
+.glow-bronze {
+    box-shadow: 0 0 15px rgba(217, 119, 6, 0.4);
+}

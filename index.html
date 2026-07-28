@@ -33,29 +33,11 @@
         }
     </script>
     
-    <!-- Fonts and Custom Smooth Styles -->
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #090d16;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
-        }
-        .bar-fill {
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-    </style>
+    
+    <!-- Custom CSS Link -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="h-full flex flex-col justify-between overflow-x-hidden antialiased">
 
@@ -104,6 +86,7 @@
                         <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Interactive Speech Math</p>
                     </div>
                 </div>
+<<<<<<< HEAD
 <button id="menu-toggle-btn" onclick="navigateTo('settings')" class="p-2.5 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-300 hover:text-white rounded-xl transition flex items-center">
     <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -111,6 +94,14 @@
     </svg>
 </button>
 
+=======
+                <button id="menu-toggle-btn" onclick="navigateTo('settings')" class="p-2.5 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-300 hover:text-white rounded-xl transition flex items-center">
+                    <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </button>
+>>>>>>> update
             </div>
         </header>
 
@@ -119,7 +110,60 @@
 
             <!-- HOME PAGE -->
             <section id="view-home" class="space-y-12 animate-fade-in">
-                <div class="text-center max-w-3xl mx-auto space-y-6 pt-6">
+                
+                <!-- TOP 3 RANKERS PODIUM (GLOW & CURVED NAME EFFECT) -->
+                <div class="flex items-end justify-center gap-2 md:gap-6 pt-6 pb-2 select-none">
+                    
+                    <!-- 3RD RANK (LEFT - BRONZE / SOFT GLOW / SMALL CIRCLE) -->
+                    <div class="flex flex-col items-center">
+                        <div class="relative w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-amber-600/80 bg-slate-900 shadow-[0_0_15px_rgba(217,119,6,0.4)] flex items-center justify-center p-0.5">
+                            <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-slate-950">
+                                <img id="top-3rd-img" src="" alt="3rd Rank" class="w-full h-full object-cover hidden">
+                                <span id="top-3rd-fallback" class="text-2xl">🥉</span>
+                            </div>
+                            <span class="absolute -top-2 -right-1 bg-amber-700 text-amber-100 text-[10px] font-black px-1.5 py-0.5 rounded-full border border-amber-500 shadow">3rd</span>
+                        </div>
+                        <span id="top-3rd-name" class="text-xs font-bold text-slate-300 mt-2 tracking-wide truncate max-w-[70px] text-center">3rd Rank</span>
+                    </div>
+
+                    <!-- 1ST RANK (CENTER - GOLD / MAXIMUM GLOW / LARGEST CIRCLE) -->
+                    <div class="flex flex-col items-center -translate-y-4">
+                        <div class="relative flex flex-col items-center">
+                            <div class="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-yellow-400 bg-slate-900 shadow-[0_0_30px_rgba(250,204,21,0.8),0_0_50px_rgba(234,179,8,0.4)] animate-pulse flex items-center justify-center p-1 z-10">
+                                <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-slate-950 border border-yellow-300/40">
+                                    <img id="top-1st-img" src="" alt="1st Rank" class="w-full h-full object-cover hidden">
+                                    <span id="top-1st-fallback" class="text-4xl">🥇</span>
+                                </div>
+                                <span class="absolute -top-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 text-xs font-black px-2.5 py-0.5 rounded-full border border-yellow-200 shadow-lg tracking-wider">👑 1st</span>
+                            </div>
+
+                            <!-- Curved SVG Name (सर्कल के नीचे कर्व शेप में लिखा नाम) -->
+                            <svg class="w-32 h-12 md:w-40 md:h-14 -mt-3 overflow-visible pointer-events-none" viewBox="0 0 160 60">
+                                <path id="curve-path-1st" d="M 10,10 A 70,70 0 0,0 150,10" fill="transparent" />
+                                <text class="fill-yellow-400 font-extrabold text-[13px] md:text-[14px] tracking-wider uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                                    <textPath href="#curve-path-1st" startOffset="50%" text-anchor="middle" id="top-1st-name">
+                                        1st Rank
+                                    </textPath>
+                                </text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 2ND RANK (RIGHT - SILVER / MEDIUM GLOW / MEDIUM CIRCLE) -->
+                    <div class="flex flex-col items-center">
+                        <div class="relative w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-slate-300 bg-slate-900 shadow-[0_0_20px_rgba(203,213,225,0.5)] flex items-center justify-center p-0.5">
+                            <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-slate-950">
+                                <img id="top-2nd-img" src="" alt="2nd Rank" class="w-full h-full object-cover hidden">
+                                <span id="top-2nd-fallback" class="text-2xl">🥈</span>
+                            </div>
+                            <span class="absolute -top-2 -right-1 bg-slate-700 text-slate-100 text-[10px] font-black px-1.5 py-0.5 rounded-full border border-slate-400 shadow">2nd</span>
+                        </div>
+                        <span id="top-2nd-name" class="text-xs font-bold text-slate-300 mt-2 tracking-wide truncate max-w-[70px] text-center">2nd Rank</span>
+                    </div>
+
+                </div>
+
+                <div class="text-center max-w-3xl mx-auto space-y-6 pt-2">
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-400 border border-brand-500/20">
                         🎙️ Voice-Activated Verbal Calculation Trainer (Hindi/Hinglish Support)
                     </span>
@@ -682,7 +726,112 @@
             </section>
             
 
+            <!-- ADMIN CONTROL CENTER VIEW -->
+            <section id="view-admin" class="hidden space-y-8 animate-fade-in">
+                <!-- Header Title -->
+                <div class="pb-4 border-b border-slate-800 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-white flex items-center gap-2">
+                            <span>🛠️ Admin Control Panel</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">Calcu-Voice Cloud Student Management System</p>
+                    </div>
+                    <span class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/20 px-3 py-1 rounded-full font-bold">
+                        Secure Access
+                    </span>
+                </div>
+
+                <!-- PASSWORD LOCK SCREEN -->
+                <div id="admin-auth" class="space-y-6 max-w-md mx-auto w-full pt-6">
+                    <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-2xl">
+                        <h3 class="text-xl font-bold text-center text-white">🔒 Admin Authentication</h3>
+                        <p class="text-xs text-slate-400 text-center">कृपया एडमिन पैनल खोलने के लिए अपना गुप्त पिन दर्ज करें।</p>
+                        <div class="space-y-2">
+                            <input type="password" id="admin-pin" placeholder="Enter Admin PIN..." class="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-center text-sm text-white focus:outline-none focus:border-rose-500 w-full tracking-widest">
+                        </div>
+                        <button onclick="checkAdminAuth()" class="w-full px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl transition shadow-lg shadow-rose-600/10">
+                            Unlock Panel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MAIN ADMIN INTERFACE -->
+                <div id="admin-dashboard" class="hidden space-y-8">
+                    
+                    <!-- Quick Info & Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xs font-bold text-slate-400 uppercase">Total Logged Students</h3>
+                                <p class="text-2xl font-black text-indigo-400 font-mono mt-1" id="total-students-count">0</p>
+                            </div>
+                            <button onclick="fetchAdminCloudData()" class="px-3 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition">
+                                🔄 Refresh Data
+                            </button>
+                        </div>
+                        <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xs font-bold text-slate-400 uppercase">Admin Session Status</h3>
+                                <p class="text-sm font-semibold text-emerald-400 mt-2">● Active & Secure</p>
+                            </div>
+                            <button onclick="lockAdminPanel()" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition">
+                                🔒 Lock Panel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- NEW STUDENT REGISTRATION FORM -->
+                    <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <h3 class="text-sm font-extrabold text-slate-200 flex items-center space-x-2">
+                            <span>👤 Register New Student Account</span>
+                        </h3>
+                        <p class="text-xs text-slate-400">यहाँ से आप किसी भी नए छात्र का अकाउंट सीधे गूगल शीट डेटाबेस में बना सकते हैं।</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
+                            <input type="text" id="new-reg-name" placeholder="Full Name (असली नाम)" class="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500">
+                            <input type="text" id="new-reg-class" placeholder="Class (कक्षा जैसे: 8th)" class="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500">
+                            <input type="number" id="new-reg-age" placeholder="Age (उम्र)" class="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500">
+                            <input type="text" id="new-reg-userid" placeholder="Create User ID (यूनिक)" class="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500">
+                            <input type="password" id="new-reg-password" placeholder="Create Password" class="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500">
+                            <button onclick="handleAdminSignup()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 font-bold text-xs text-white rounded-xl transition shadow-lg">
+                                Create Student Account
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Student Management Table -->
+                    <div class="bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden">
+                        <div class="p-4 bg-slate-950/60 border-b border-slate-800 flex justify-between items-center">
+                            <h3 class="text-sm font-extrabold text-slate-200">User Details & Ratings Management</h3>
+                            <span class="text-[11px] text-slate-500">Note: Edits update both Users & Leaderboard sheets</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-950/40 border-b border-slate-800 text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">
+                                        <th class="p-4">User ID</th>
+                                        <th class="p-4">Name</th>
+                                        <th class="p-4">Password</th>
+                                        <th class="p-4 text-center">Class</th>
+                                        <th class="p-4 text-center">Age</th>
+                                        <th class="p-4 text-center">Elo Rating</th>
+                                        <th class="p-4 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-table-body" class="divide-y divide-slate-800/60 text-xs text-slate-300">
+                                    <tr>
+                                        <td colspan="7" class="p-8 text-center text-slate-500 italic">कृपया डेटा लोड करने के लिए Refresh Data बटन दबाएं।</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+            
+
         </main>
+<<<<<<< HEAD
 
         <!-- BOTTOM NAVIGATION BAR -->
         <nav class="fixed bottom-0 left-0 right-0 bg-slate-950/90 border-t border-slate-800/80 backdrop-blur-lg z-40 px-4 py-2 flex justify-around items-center text-xs">
@@ -733,6 +882,58 @@
 
 
     </div>
+=======
+
+        <!-- BOTTOM NAVIGATION BAR -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-slate-950/90 border-t border-slate-800/80 backdrop-blur-lg z-40 px-4 py-2 flex justify-around items-center text-xs">
+            
+            <!-- Home Button -->
+            <button onclick="navigateTo('home')" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-indigo-400 focus:text-indigo-400 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span class="font-bold text-[10px]">Home</span>
+            </button>
+
+            <!-- Score History Button -->
+            <button onclick="navigateTo('scores')" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-indigo-400 focus:text-indigo-400 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 012-2h2a2 2 0 012 2z"/>
+                </svg>
+                <span class="font-bold text-[10px]">Score History</span>
+            </button>
+
+            <!-- Leaderboard Button -->
+            <button onclick="navigateTo('leaderboard')" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-indigo-400 focus:text-indigo-400 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                </svg>
+                <span class="font-bold text-[10px]">Leaderboard</span>
+            </button>
+
+            <!-- Profile Button -->
+            <button onclick="navigateTo('profile')" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-indigo-400 focus:text-indigo-400 transition">
+                <div id="bottom-nav-avatar-container" class="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </div>
+                <span class="font-bold text-[10px]">Profile</span>
+            </button>
+
+            <!-- Admin Button (केवल shivam@123 के लिए) -->
+            <button id="nav-btn-admin" onclick="navigateTo('admin')" class="hidden flex-col items-center space-y-1 text-rose-400 hover:text-rose-300 focus:text-rose-300 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                <span class="font-bold text-[10px]">Admin</span>
+            </button>
+
+        </nav>
+
+    </div>
+
+>>>>>>> update
     <!-- EDIT USER MODAL FOR ADMIN -->
     <div id="edit-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
@@ -785,6 +986,7 @@
     <footer class="border-t border-slate-900 py-6 text-center text-slate-600 text-[11px] font-medium tracking-wide pb-20">
         &copy; 2026 Calcu-Voice App. Engineered for Premium Mental Calculation Performance.
     </footer>
+<<<<<<< HEAD
     <!-- Active State Logic Implementation Code -->
     <script>
         const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxH_D_ifKnXfDQJvWCGOBUKgm8FD8WniwIg8470d2UXR3WmBEUuUiBp0M3mwiK8zRQcTA/exec";
@@ -2909,5 +3111,10 @@
         }
         
     </script>
+=======
+
+    <!-- Custom JS Link -->
+    <script src="script.js"></script>
+>>>>>>> update
 </body>
 </html>

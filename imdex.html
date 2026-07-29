@@ -116,21 +116,22 @@
                         <span id="top-3rd-name" class="text-xs font-bold text-slate-300 mt-2 tracking-wide truncate max-w-[70px] text-center">3rd Rank</span>
                     </div>
 
-                    <!-- 1ST RANK (CENTER - GOLD / MAXIMUM GLOW / LARGEST CIRCLE) -->
+                    <!-- 1ST RANK (CENTER - GOLD / MAXIMUM EXTRA GLOW / LARGEST CIRCLE) -->
                     <div class="flex flex-col items-center -translate-y-4">
                         <div class="relative flex flex-col items-center">
-                            <div class="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-yellow-400 bg-slate-900 shadow-[0_0_30px_rgba(250,204,21,0.8),0_0_50px_rgba(234,179,8,0.4)] animate-pulse flex items-center justify-center p-1 z-10">
-                                <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-slate-950 border border-yellow-300/40">
+                            <!-- Glow Shadow बढ़ा दी गई है और drop-shadow जोड़ा गया है -->
+                            <div class="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-yellow-300 bg-amber-950/30 shadow-[0_0_40px_rgba(250,204,21,1),0_0_80px_rgba(234,179,8,0.8),0_0_120px_rgba(250,204,21,0.5)] flex items-center justify-center p-1 z-10">
+                                <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-slate-900 border-2 border-yellow-300 shadow-[inner_0_0_15px_rgba(250,204,21,0.8)]">
                                     <img id="top-1st-img" src="" alt="1st Rank" class="w-full h-full object-cover hidden">
-                                    <span id="top-1st-fallback" class="text-4xl">🥇</span>
+                                    <span id="top-1st-fallback" class="text-4xl drop-shadow-[0_0_10px_rgba(250,204,21,1)]">🥇</span>
                                 </div>
-                                <span class="absolute -top-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 text-xs font-black px-2.5 py-0.5 rounded-full border border-yellow-200 shadow-lg tracking-wider">👑 1st</span>
+                                <span class="absolute -top-3 bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 text-slate-950 text-xs font-black px-3 py-0.5 rounded-full border-2 border-yellow-100 shadow-[0_0_15px_rgba(250,204,21,0.9)] tracking-wider">👑 1st</span>
                             </div>
 
-                            <!-- Curved SVG Name (सर्कल के नीचे कर्व शेप में लिखा नाम) -->
+                            <!-- Curved SVG Name -->
                             <svg class="w-32 h-12 md:w-40 md:h-14 -mt-3 overflow-visible pointer-events-none" viewBox="0 0 160 60">
                                 <path id="curve-path-1st" d="M 10,10 A 70,70 0 0,0 150,10" fill="transparent" />
-                                <text class="fill-yellow-400 font-extrabold text-[13px] md:text-[14px] tracking-wider uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                                <text class="fill-yellow-300 font-extrabold text-[13px] md:text-[14px] tracking-wider uppercase drop-shadow-[0_0_8px_rgba(250,204,21,0.9)]">
                                     <textPath href="#curve-path-1st" startOffset="50%" text-anchor="middle" id="top-1st-name">
                                         1st Rank
                                     </textPath>
@@ -429,6 +430,32 @@
                         </button>
                     </div>
 
+                    <!-- INCOGNITO / PRACTICE MODE CONTROL -->
+                    <div class="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100">🕵️ Incognito / Custom Practice Mode</h3>
+                                <p class="text-xs text-slate-400">इसे ऑन करने पर आपकी रेटिंग अपडेट नहीं होगी और आप मनपसंद लेवल चुन सकते हैं।</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="incognito-toggle" class="sr-only peer" onchange="toggleIncognitoUI()">
+                                <div class="w-11 h-6 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                            </label>
+                        </div>
+
+                        <!-- DROP DOWN TO SELECT PRACTICE TIER LEVEL -->
+                        <div id="incognito-level-box" class="hidden space-y-2 border-t border-slate-800 pt-3">
+                            <label class="text-xs font-bold text-slate-300">Select Practice Tier Level:</label>
+                            <select id="incognito-tier-select" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-indigo-400 font-bold focus:outline-none">
+                                <option value="learner">Learner (Beginner)</option>
+                                <option value="silver">Silver Tier</option>
+                                <option value="gold">Gold Tier</option>
+                                <option value="diamond">Diamond Tier</option>
+                                <option value="heroic">Heroic / Grandmaster Tier</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="flex items-center justify-between pb-4 border-b border-slate-800">
                         <div>
                             <h3 class="text-sm font-bold text-slate-100">Global Countdown Timers</h3>
@@ -602,6 +629,17 @@
                             <span class="text-slate-400 font-medium">Current Math Rating</span>
                             <span class="font-mono font-black text-indigo-400 text-sm" id="profile-display-rating">120</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- SWITCH ACCOUNT LIST SECTION -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 space-y-3 shadow-xl">
+                    <h3 class="text-xs font-extrabold uppercase tracking-widest text-slate-500 border-b border-slate-800 pb-2 flex items-center justify-between">
+                        <span>Switch Account 🔄</span>
+                        <span class="text-[10px] text-slate-400 lowercase font-normal">Saved sessions</span>
+                    </h3>
+                    <div id="switch-accounts-list" class="space-y-2">
+                        <!-- Populated dynamically via JavaScript -->
                     </div>
                 </div>
 
@@ -936,7 +974,9 @@ const categories = [
 let appSettings = {
     categoryTimes: {},     
     countdownEnabled: {},  
-    globalTimer: true     
+    globalTimer: true,
+    incognitoMode: false,
+    customPracticeTier: "learner"
 };
 
 let selectedCounts = {};    
@@ -988,6 +1028,7 @@ window.onload = function() {
         
         loadSavedProfileImage();
         loadTop3Podium();
+        refreshUserDataFromCloud(playerId);
     } else {
         document.getElementById('view-auth').classList.remove('hidden');
         document.getElementById('main-app-content').classList.add('hidden');
@@ -1000,6 +1041,96 @@ function callCloudAPI(payload) {
         method: "POST",
         body: JSON.stringify(payload)
     }).then(res => res.json());
+}
+
+function refreshUserDataFromCloud(uId) {
+    if (!uId) return Promise.resolve();
+    return callCloudAPI({ action: "fetch" })
+    .then(players => {
+        if (players && players.length > 0) {
+            const current = players.find(p => p.id === uId);
+            if (current) {
+                studentRating = parseFloat(current.rating) || 120;
+                studentName = current.name || studentName;
+                localStorage.setItem('auth_rating', studentRating);
+                localStorage.setItem('auth_name', studentName);
+
+                saveAccountToMultiList(uId, studentName, studentRating, current.profilePicUrl || localStorage.getItem(`profile_img_${uId}`));
+
+                if (document.getElementById('home-rating-display')) 
+                    document.getElementById('home-rating-display').innerText = studentRating;
+                if (document.getElementById('lb-user-rating')) 
+                    document.getElementById('lb-user-rating').innerText = studentRating;
+                if (document.getElementById('profile-display-rating')) 
+                    document.getElementById('profile-display-rating').innerText = studentRating;
+            }
+        }
+    })
+    .catch(err => console.error("Cloud Auto-Sync rating error:", err));
+}
+
+function saveAccountToMultiList(uId, name, rating, profilePic) {
+    let accounts = JSON.parse(localStorage.getItem('saved_accounts')) || [];
+    const index = accounts.findIndex(acc => acc.id === uId);
+    const accData = { id: uId, name: name, rating: rating, profilePicUrl: profilePic || "" };
+    
+    if (index > -1) {
+        accounts[index] = accData;
+    } else {
+        accounts.push(accData);
+    }
+    localStorage.setItem('saved_accounts', JSON.stringify(accounts));
+}
+
+function renderSwitchAccountList() {
+    const listContainer = document.getElementById('switch-accounts-list');
+    if (!listContainer) return;
+    
+    const accounts = JSON.parse(localStorage.getItem('saved_accounts')) || [];
+    const currentUserId = localStorage.getItem('auth_userid');
+    
+    listContainer.innerHTML = '';
+    
+    if (accounts.length === 0 && currentUserId) {
+        saveAccountToMultiList(currentUserId, studentName, studentRating, localStorage.getItem(`profile_img_${currentUserId}`));
+        renderSwitchAccountList();
+        return;
+    }
+
+    accounts.forEach(acc => {
+        const isCurrent = acc.id === currentUserId;
+        const row = document.createElement('div');
+        row.className = "flex items-center justify-between p-2.5 bg-slate-950 rounded-xl border border-slate-800/80";
+        
+        row.innerHTML = `
+            <div class="flex items-center space-x-2 truncate pr-2">
+                <span class="text-xs font-bold text-white truncate">${acc.name}</span>
+                <span class="text-[10px] font-mono text-slate-400">(${acc.id})</span>
+            </div>
+            ${isCurrent 
+                ? '<span class="text-[10px] text-emerald-400 font-extrabold px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg shrink-0">Active</span>' 
+                : `<button onclick="switchUserAccount('${acc.id}')" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-lg transition shadow shrink-0">Switch</button>`
+            }
+        `;
+        listContainer.appendChild(row);
+    });
+}
+
+function switchUserAccount(targetUserId) {
+    const accounts = JSON.parse(localStorage.getItem('saved_accounts')) || [];
+    const targetAcc = accounts.find(a => a.id === targetUserId);
+    
+    if (targetAcc) {
+        showToast("⏳", `Switching account to ${targetAcc.name}...`);
+        
+        localStorage.setItem('auth_userid', targetAcc.id);
+        localStorage.setItem('auth_name', targetAcc.name);
+        localStorage.setItem('auth_rating', targetAcc.rating);
+        
+        refreshUserDataFromCloud(targetAcc.id).finally(() => {
+            location.reload();
+        });
+    }
 }
 
 function toggleAuthMode(toSignup) {
@@ -1083,6 +1214,8 @@ function executeAutoLogin(uId, pass) {
             studentName = resData.name;
             studentRating = resData.rating;
 
+            saveAccountToMultiList(uId, studentName, studentRating, resData.profilePicUrl || "");
+
             const todayStr = getTodayDateString();
             if (resData.lastDate === todayStr && !isNaN(parseInt(resData.todayCount, 10))) {
                 todaySolvedCount = parseInt(resData.todayCount, 10);
@@ -1149,9 +1282,15 @@ function navigateTo(viewId) {
         if(activeTestState.currentQuestionTimer) clearInterval(activeTestState.currentQuestionTimer);
     }
 
-    if (viewId === 'home') loadTop3Podium();
+    if (viewId === 'home') {
+        loadTop3Podium();
+        refreshUserDataFromCloud(playerId);
+    }
     if (viewId === 'scores') loadScoresHistory();
-    if (viewId === 'leaderboard') renderLeaderboard();
+    if (viewId === 'leaderboard') {
+        renderLeaderboard();
+        refreshUserDataFromCloud(playerId);
+    }
     if (viewId === 'profile') {
         document.getElementById('profile-card-name').innerText = studentName;
         document.getElementById('profile-display-id').innerText = playerId;
@@ -1160,6 +1299,8 @@ function navigateTo(viewId) {
         document.getElementById('profile-display-age').innerText = localStorage.getItem('auth_age') || "Not Set";
         document.getElementById('profile-card-status').innerText = getPlayerStatus(studentRating);
         loadSavedProfileImage();
+        renderSwitchAccountList();
+        refreshUserDataFromCloud(playerId);
     }
 }
 
@@ -1193,6 +1334,7 @@ function handleProfileImageUpload(event) {
             const uploadedUrl = cloudinaryRes.secure_url;
 
             localStorage.setItem(`profile_img_${playerId}`, uploadedUrl);
+            saveAccountToMultiList(playerId, studentName, studentRating, uploadedUrl);
             loadSavedProfileImage();
 
             showToast("⏳", "गूगल शीट में सेव हो रही है...");
@@ -1288,11 +1430,12 @@ function initSettings() {
 
     const savedSettings = localStorage.getItem('calcu_voice_settings');
     if (savedSettings) {
-        appSettings = JSON.parse(savedSettings);
+        appSettings = Object.assign({}, appSettings, JSON.parse(savedSettings));
     }
 }
 
 function uploadRatingToCloud() {
+    if (appSettings.incognitoMode) return; // Prevent cloud uploads in Incognito Practice Mode
     fetch(GOOGLE_SHEET_API_URL, {
         method: "POST",
         mode: "no-cors",
@@ -1308,6 +1451,7 @@ function uploadRatingToCloud() {
         })
     }).catch(err => console.log("Cloud update error:", err));
     localStorage.setItem('auth_rating', studentRating);
+    saveAccountToMultiList(playerId, studentName, studentRating, localStorage.getItem(`profile_img_${playerId}`));
 }
 
 function resetCustomization() {
@@ -1411,11 +1555,32 @@ function proceedToOverview() {
     navigateTo('overview');
 }
 
+function toggleIncognitoUI() {
+    const isChecked = document.getElementById('incognito-toggle').checked;
+    const levelBox = document.getElementById('incognito-level-box');
+    if (isChecked) {
+        levelBox.classList.remove('hidden');
+    } else {
+        levelBox.classList.add('hidden');
+    }
+}
+
+function getActivePracticeQuestionTier() {
+    if (appSettings.incognitoMode && appSettings.customPracticeTier) {
+        return appSettings.customPracticeTier;
+    }
+    return getEloQuestionTier(studentRating);
+}
+
 function renderSettingsPage() {
     const list = document.getElementById('settings-categories-list');
     list.innerHTML = '';
 
     document.getElementById('global-timer-toggle').checked = appSettings.globalTimer;
+    document.getElementById('incognito-toggle').checked = appSettings.incognitoMode || false;
+    document.getElementById('incognito-tier-select').value = appSettings.customPracticeTier || "learner";
+    
+    toggleIncognitoUI();
 
     categories.forEach(cat => {
         const time = appSettings.categoryTimes[cat.name] || 15;
@@ -1449,6 +1614,9 @@ function toggleGlobalTimerSetting() {
 }
 
 function saveAllSettings() {
+    appSettings.incognitoMode = document.getElementById('incognito-toggle').checked;
+    appSettings.customPracticeTier = document.getElementById('incognito-tier-select').value;
+
     categories.forEach(cat => {
         const timeInput = document.getElementById(`setting-time-${cat.id}`);
         const activeInput = document.getElementById(`setting-active-${cat.id}`);
@@ -1684,6 +1852,7 @@ function generateArithmeticExpression(categoryName) {
     let questionText = '';
     let correctAnswer = 0;
     const level = categoryDifficulty[categoryName] || 2;
+    const activeTier = getActivePracticeQuestionTier();
 
     switch(categoryName) {
         case "Addition (1 Digit)": {
@@ -1696,9 +1865,8 @@ function generateArithmeticExpression(categoryName) {
         }
         case "Addition":
         case "Addition (2 Digit)": {
-            const tier = getEloQuestionTier(studentRating);
-            if (tier !== "learner") {
-                const result = generateTieredAddition(tier);
+            if (activeTier !== "learner") {
+                const result = generateTieredAddition(activeTier);
                 questionText = result.questionText;
                 correctAnswer = result.correctAnswer;
             } else {
@@ -1818,9 +1986,8 @@ function generateArithmeticExpression(categoryName) {
             break;
         }
         case "Square": {
-            const tier = getEloQuestionTier(studentRating);
-            if (tier !== "learner") {
-                const result = generateTieredSquare(tier);
+            if (activeTier !== "learner") {
+                const result = generateTieredSquare(activeTier);
                 questionText = result.questionText;
                 correctAnswer = result.correctAnswer;
             } else {
@@ -1873,9 +2040,8 @@ function generateArithmeticExpression(categoryName) {
             break;
         }
         case "Cube Root (11-50)": {
-            const tier = getEloQuestionTier(studentRating);
-            if (tier !== "learner") {
-                const result = generateTieredCubeRoot(tier);
+            if (activeTier !== "learner") {
+                const result = generateTieredCubeRoot(activeTier);
                 questionText = result.questionText;
                 correctAnswer = result.correctAnswer;
             } else {
@@ -1897,9 +2063,8 @@ function generateArithmeticExpression(categoryName) {
             break;
         }
         case "HCF": {
-            const tier = getEloQuestionTier(studentRating);
-            if (tier !== "learner") {
-                const result = generateTieredHCF(tier);
+            if (activeTier !== "learner") {
+                const result = generateTieredHCF(activeTier);
                 questionText = result.questionText;
                 correctAnswer = result.correctAnswer;
             } else {
@@ -1929,9 +2094,8 @@ function generateArithmeticExpression(categoryName) {
             break;
         }
         case "Percentage": {
-            const tier = getEloQuestionTier(studentRating);
-            if (tier !== "learner") {
-                const result = generateTieredPercentage(tier);
+            if (activeTier !== "learner") {
+                const result = generateTieredPercentage(activeTier);
                 questionText = result.questionText;
                 correctAnswer = result.correctAnswer;
             } else {
@@ -1954,9 +2118,8 @@ function generateArithmeticExpression(categoryName) {
         }
         case "BODMAS Rules": 
         default: {
-            const tier = getEloQuestionTier(studentRating);
-            if (tier !== "learner") {
-                const result = generateTieredBODMAS(tier);
+            if (activeTier !== "learner") {
+                const result = generateTieredBODMAS(activeTier);
                 questionText = result.questionText;
                 correctAnswer = result.correctAnswer;
             } else if (level === 1) {
@@ -2004,7 +2167,6 @@ function startTestProcess() {
     navigateTo('test');
     loadCurrentQuestion();
 }
-
 function loadCurrentQuestion() {
     clearInterval(activeTestState.currentQuestionTimer);
     stopSpeechRecognition();
@@ -2107,21 +2269,25 @@ function handleAnswerValidation(isCorrect, debugMsg) {
 
     const squeezeApplies = isSqueezeEligible(studentRating, currentCategory);
 
-    studentRating = calculateNewRating(
-        studentRating, 
-        isCorrect, 
-        currentQuestionLevel, 
-        isTimerActive, 
-        secondsUsed, 
-        maxDuration,
-        currentStreak,
-        wasLastWrong,
-        squeezeApplies
-    );
-    document.getElementById('home-rating-display').innerText = studentRating;
+    if (!appSettings.incognitoMode) {
+        studentRating = calculateNewRating(
+            studentRating, 
+            isCorrect, 
+            currentQuestionLevel, 
+            isTimerActive, 
+            secondsUsed, 
+            maxDuration,
+            currentStreak,
+            wasLastWrong,
+            squeezeApplies
+        );
+        document.getElementById('home-rating-display').innerText = studentRating;
 
-    incrementTodaySolvedCount();
-    uploadRatingToCloud();
+        incrementTodaySolvedCount();
+        uploadRatingToCloud();
+    } else {
+        incrementTodaySolvedCount();
+    }
 
     wasLastWrong = !isCorrect;
 
@@ -2201,12 +2367,15 @@ function finishTestRun() {
     const correct = activeTestState.correctCount;
     const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
 
-    if (percentage >= 90 && total >= 5) {
-        studentRating = parseFloat((studentRating + 0.5).toFixed(1));
-        showToast("🏆", "शानदार एक्यूरेसी! आपको +0.5 रेटिंग बोनस मिला।");
+    if (!appSettings.incognitoMode) {
+        if (percentage >= 90 && total >= 5) {
+            studentRating = parseFloat((studentRating + 0.5).toFixed(1));
+            showToast("🏆", "शानदार एक्यूरेसी! आपको +0.5 रेटिंग बोनस मिला।");
+        }
+        uploadRatingToCloud();
+    } else {
+        showToast("🕵️", "Incognito Practice Completed! Rating not modified.");
     }
-    
-    uploadRatingToCloud();
 
     currentStreak = 0;
     wasLastWrong = false;
@@ -2333,7 +2502,6 @@ function reconstructSpokenNumber(text) {
     }
     return null;
 }
-
 function verifyVerbalResponse(transcript, actualAns) {
     const parsedObj = reconstructSpokenNumber(transcript);
     if (parsedObj === null) return false;
@@ -2718,10 +2886,8 @@ function renderLeaderboard() {
         if(chartContainer) chartContainer.innerHTML = '';
         console.error(err);
     });
-}
-
-// ================= ADMIN CONTROL SYSTEM =================
-const ADMIN_SECRET_PIN = "7368"; 
+      }
+      const ADMIN_SECRET_PIN = "7368"; 
 let globalPlayersData = [];
 
 function getDynamicTimePin() {
@@ -2748,7 +2914,7 @@ function checkAdminAuth() {
         showToast("🔓", "Access Granted! Time PIN Verified.");
         fetchAdminCloudData();
     } else {
-        showToast("❌", "गलत पिन! वर्तमान समय (hhmm) दर्ज करें।");
+        showToast("❌", "wrong pin !");
     }
 }
 
